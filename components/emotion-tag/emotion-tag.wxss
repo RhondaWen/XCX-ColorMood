@@ -1,0 +1,29 @@
+/* components/emotion-tag/emotion-tag.wxss */
+.emotion-tag {
+  padding: 8px 12px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.emotion-tag.selected {
+  border: 2px solid var(--tag-color);
+}
+
+.tag-icon {
+  font-size: 24px;
+}
+
+.tag-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2C2C2C;
+  margin-top: 4px;
+}
+
+.tag-name-en {
+  font-size: 10px;
+  color: #6B6B6B;
+}

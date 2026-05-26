@@ -1,0 +1,260 @@
+/* pages/mine/mine.wxss */
+.mine-page {
+  min-height: 100vh;
+  background: #F9F5F0;
+}
+
+/* Hero */
+.mine-hero {
+  padding: 24px 16px 32px;
+  background: linear-gradient(160deg, #C9B8E8 0%, #DDD3F0 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.mine-hero::before {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: rgba(255,255,255,.2);
+  border-radius: 50%;
+  top: -60px;
+  right: -40px;
+}
+
+.hero-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.hero-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2C2C2C;
+  margin-top: 8px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 16px;
+}
+
+.stat-item { text-align: center; }
+
+.stat-num {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #6B6B6B;
+}
+
+/* 情绪色历 */
+.calendar-section {
+  padding: 16px;
+  background: #fff;
+  margin: 12px 16px 0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.calendar-month {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2C2C2C;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #D9D0C7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #6B6B6B;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 10px;
+  color: #6B6B6B;
+  font-weight: 600;
+  padding: 2px 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.cal-day.empty { background: transparent; }
+.cal-day.today { box-shadow: 0 0 0 2px #F18F43; }
+
+.calendar-legend {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.legend-text {
+  font-size: 11px;
+  color: #6B6B6B;
+}
+
+/* 我的收藏 */
+.favorites-section {
+  padding: 16px;
+}
+
+.favorites-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.favorites-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2C2C2C;
+}
+
+.favorites-more {
+  font-size: 13px;
+  color: #F18F43;
+}
+
+.favorites-scroll {
+  display: flex;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.fav-card {
+  width: 120px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  flex-shrink: 0;
+}
+
+.fav-strip {
+  height: 50px;
+  display: flex;
+}
+
+.fav-strip-item { flex: 1; }
+
+.fav-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2C2C2C;
+  padding: 6px 8px 8px;
+}
+
+/* 菜单 */
+.mine-menu {
+  margin: 0 16px 32px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #D9D0C7;
+}
+
+.menu-item:last-of-type { border-bottom: none; }
+
+.menu-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-icon { font-size: 18px; }
+
+.menu-text {
+  font-size: 14px;
+  color: #2C2C2C;
+}
+
+.menu-arrow {
+  font-size: 16px;
+  color: #6B6B6B;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 40px;
+  background: transparent;
+  border: 1.5px solid #E07070;
+  border-radius: 9999px;
+  color: #E07070;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+.logout-btn::after { border: none; }

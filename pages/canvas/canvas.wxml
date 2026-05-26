@@ -1,0 +1,40 @@
+<!--pages/canvas/canvas.wxml-->
+<view class="canvas-page">
+  <view class="nav-bar">
+    <view class="nav-back" bindtap="onGoBack">←</view>
+    <view class="nav-title">配色画板</view>
+    <view class="nav-action" bindtap="onSave">保存</view>
+  </view>
+
+  <view class="toolbar">
+    <view class="shape-btn {{currentShape === 'rect' ? 'active' : ''}}" data-shape="rect" bindtap="onShapeChange">▬</view>
+    <view class="shape-btn {{currentShape === 'circle' ? 'active' : ''}}" data-shape="circle" bindtap="onShapeChange">⬤</view>
+    <view class="divider"></view>
+    <view class="color-palette">
+      <block wx:for="{{paletteColors}}" wx:key="*this">
+        <view
+          class="color-dot {{currentColor === item ? 'active' : ''}}"
+          style="background: {{item}}"
+          data-color="{{item}}"
+          bindtap="onColorSelect"
+        ></view>
+      </block>
+    </view>
+  </view>
+
+  <view class="canvas-area">
+    <canvas
+      type="2d"
+      id="drawCanvas"
+      class="draw-canvas"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+    ></canvas>
+
+    <view class="canvas-actions">
+      <view class="action-btn" bindtap="onUndo">↩</view>
+      <view class="action-btn" bindtap="onClear">🗑</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,56 @@
+<!--pages/tools/tools.wxml-->
+<view class="tools-page">
+  <view class="section-header">
+    <view class="section-title">配色工具</view>
+    <view class="section-sub">让颜色为你服务</view>
+  </view>
+
+  <view class="shake-card" bindtap="onManualShake">
+    <view class="shake-icon">📱</view>
+    <view class="shake-text">
+      <view class="shake-title">摇一摇，随机配色</view>
+      <view class="shake-desc">晃动手机 · 生成莫兰迪配色</view>
+    </view>
+    <view class="shake-arrow">→</view>
+  </view>
+
+  <view class="generator-card">
+    <view class="gen-title">🪄 配色生成器</view>
+    <view class="color-input-row">
+      <view class="color-swatch" style="background: {{baseColor}}">
+        <picker mode="color" bindchange="onColorChange" value="{{baseColor}}">
+          <view class="picker-inner"></view>
+        </picker>
+      </view>
+      <input class="hex-input" type="text" value="{{baseColor}}" bindinput="onHexInput" placeholder="#RRGGBB" />
+    </view>
+
+    <view class="mode-btns">
+      <block wx:for="{{modes}}" wx:key="key">
+        <view class="mode-btn {{mode === item.key ? 'active' : ''}}" data-mode="{{item.key}}" bindtap="onModeChange">{{item.name}}</view>
+      </block>
+    </view>
+
+    <view class="gen-result">
+      <block wx:for="{{generatedColors}}" wx:key="*this">
+        <view class="color-chip" style="background: {{item}}" data-color="{{item}}" bindtap="onCopyColor">
+          <view class="chip-hex">{{item}}</view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="tools-header">更多工具</view>
+  <view class="tools-grid">
+    <view class="tool-card" bindtap="onTakePhoto">
+      <view class="tool-icon" style="background: rgba(241,143,67,.15)">📷</view>
+      <view class="tool-name">拍照取色</view>
+      <view class="tool-desc">从照片中提取你的专属配色</view>
+    </view>
+    <view class="tool-card" bindtap="onGoCanvas">
+      <view class="tool-icon" style="background: rgba(148,178,118,.15)">🖌️</view>
+      <view class="tool-name">配色画板</view>
+      <view class="tool-desc">在画布上自由预览颜色搭配</view>
+    </view>
+  </view>
+</view>

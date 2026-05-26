@@ -1,0 +1,6 @@
+<!--components/emotion-tag/emotion-tag.wxml-->
+<view class="emotion-tag {{selected ? 'selected' : ''}}" style="--tag-color: {{color}}; background: {{bgColor}}" bindtap="onTap">
+  <view class="tag-icon">{{icon}}</view>
+  <view class="tag-name">{{name}}</view>
+  <view class="tag-name-en">{{nameEn}}</view>
+</view>

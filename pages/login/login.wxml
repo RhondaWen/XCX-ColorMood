@@ -1,0 +1,56 @@
+<!--pages/login/login.wxml-->
+<view class="login-page">
+  <!-- Hero区域 -->
+  <view class="login-hero">
+    <view class="emoji-row">
+      <view class="emoji-item" style="background: #E8B4B8;">🌸</view>
+      <view class="emoji-item" style="background: #F18F43;">🔶</view>
+      <view class="emoji-item" style="background: #94B276;">🍀</view>
+      <view class="emoji-item" style="background: #C9B8E8;">🫧</view>
+    </view>
+    <view class="logo-text">
+      <text class="logo-highlight">情绪</text><text>色谱</text>
+    </view>
+    <view class="slogan">于色中，窥见万物灵韵</view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="login-form">
+    <view class="form-title">欢迎回来</view>
+    <view class="form-subtitle">用你的色彩，记录每一天</view>
+
+    <view class="input-group">
+      <view class="input-label">用户名</view>
+      <input
+        class="input-field"
+        type="text"
+        placeholder="请输入用户名"
+        value="{{username}}"
+        bindinput="onInputUsername"
+      />
+    </view>
+
+    <view class="input-group">
+      <view class="input-label">密码</view>
+      <input
+        class="input-field"
+        type="password"
+        placeholder="请输入密码"
+        value="{{password}}"
+        bindinput="onInputPassword"
+      />
+    </view>
+
+    <button class="btn-primary" bindtap="onLogin">登 录</button>
+
+    <view class="skip-login" bindtap="onSkipLogin">
+      <text class="skip-text">跳过登录，直接体验 →</text>
+    </view>
+
+    <view class="form-links">
+      <text class="link-text" bindtap="onGoRegister">
+        还没有账号？<text class="link-highlight">立即注册</text>
+      </text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,39 @@
+<!--pages/home/home.wxml-->
+<view class="home-page">
+  <!-- Header -->
+  <view class="home-header">
+    <view class="greeting-wrap">
+      <view class="greeting">今天，你是<text class="highlight">什么颜色</text>？</view>
+      <view class="greeting-sub">选择你的情绪，发现专属配色</view>
+    </view>
+    <view class="avatar">{{userInfo.avatar || '🎨'}}</view>
+  </view>
+
+  <!-- 情绪网格 -->
+  <view class="emotion-grid">
+    <block wx:for="{{emotions}}" wx:key="id">
+      <view
+        class="emotion-card"
+        style="--card-color: {{item.color}}; background: #fff;"
+        data-id="{{item.id}}"
+        bindtap="onSelectEmotion"
+      >
+        <view class="emotion-icon" style="background: {{item.bgColor}}">
+          <text>{{item.icon}}</text>
+        </view>
+        <view class="emotion-name">{{item.name}}</view>
+        <view class="emotion-name-en">{{item.nameEn}}</view>
+        <view class="emotion-desc">{{item.desc}}</view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 每日打卡 -->
+  <view class="checkin-bar" bindtap="onCheckin">
+    <view class="checkin-info">
+      <view class="checkin-label">今日情绪色打卡</view>
+      <view class="checkin-sub">记录你此刻的色彩</view>
+    </view>
+    <view class="checkin-arrow">→</view>
+  </view>
+</view>

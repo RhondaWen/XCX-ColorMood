@@ -1,0 +1,55 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/register/register",
+    "pages/home/home",
+    "pages/result/result",
+    "pages/detail/detail",
+    "pages/tools/tools",
+    "pages/canvas/canvas",
+    "pages/gallery/gallery",
+    "pages/mine/mine"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#F9F5F0",
+    "navigationBarTitleText": "情绪色谱",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F9F5F0"
+  },
+  "tabBar": {
+    "color": "#6B6B6B",
+    "selectedColor": "#F18F43",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/tools/tools",
+        "text": "工具",
+        "iconPath": "images/tools.png",
+        "selectedIconPath": "images/tools-active.png"
+      },
+      {
+        "pagePath": "pages/gallery/gallery",
+        "text": "广场",
+        "iconPath": "images/gallery.png",
+        "selectedIconPath": "images/gallery-active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "images/mine.png",
+        "selectedIconPath": "images/mine-active.png"
+      }
+    ]
+  },
+  "usingComponents": {},
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

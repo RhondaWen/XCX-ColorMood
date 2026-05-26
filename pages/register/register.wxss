@@ -1,0 +1,104 @@
+/* pages/register/register.wxss */
+.register-page {
+  min-height: 100vh;
+  background: #F9F5F0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero区域 */
+.register-hero {
+  height: 140px;
+  background: linear-gradient(135deg, #F18F43 0%, #F5A660 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.hero-title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-top: 6px;
+}
+
+/* 表单区域 */
+.register-form {
+  flex: 1;
+  padding: 24px 16px 32px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-label {
+  font-size: 12px;
+  color: #6B6B6B;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.input-field {
+  width: 100%;
+  height: 44px;
+  background: #F0EBE3;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 15px;
+  color: #2C2C2C;
+}
+
+.input-field::placeholder {
+  color: #C8C0B8;
+}
+
+.btn-primary {
+  width: 100%;
+  height: 44px;
+  background: #F18F43;
+  color: #fff;
+  border-radius: 22px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 16px;
+  border: none;
+}
+
+.btn-primary::after {
+  border: none;
+}
+
+.btn-ghost {
+  width: 100%;
+  height: 38px;
+  background: transparent;
+  color: #6B6B6B;
+  border: 1.5px solid #D9D0C7;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+.btn-ghost::after {
+  border: none;
+}
+
+.agreement {
+  text-align: center;
+  font-size: 11px;
+  color: #6B6B6B;
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+.link-highlight {
+  color: #F18F43;
+}

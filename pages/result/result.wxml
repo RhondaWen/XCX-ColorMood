@@ -1,0 +1,52 @@
+<!--pages/result/result.wxml-->
+<view class="result-page">
+  <!-- Header -->
+  <view class="result-header" style="background: linear-gradient(160deg, {{emotion.color}}33, transparent)">
+    <view class="nav-back" bindtap="onGoBack">←</view>
+    <view class="header-info">
+      <view class="emotion-icon-wrap">
+        <text class="emotion-icon">{{emotion.icon}}</text>
+      </view>
+      <view>
+        <view class="emotion-name">{{emotion.name}}</view>
+        <view class="emotion-sub">为你推荐 {{palettes.length}} 套配色方案</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 色板列表 -->
+  <scroll-view scroll-y class="palette-scroll">
+    <view class="palette-list">
+      <block wx:for="{{palettes}}" wx:key="id">
+        <view
+          class="palette-card"
+          data-id="{{item.id}}"
+          bindtap="onPaletteDetail"
+        >
+          <!-- 色条 -->
+          <view class="color-strip">
+            <block wx:for="{{item.colors}}" wx:for-item="color" wx:for-index="idx" wx:key="idx">
+              <view class="strip-item" style="background: {{color}}"></view>
+            </block>
+          </view>
+          <!-- 信息 -->
+          <view class="card-meta">
+            <view class="meta-left">
+              <view class="palette-name">{{item.name}}</view>
+              <view class="meta-bottom">
+                <view class="tag" style="background: {{emotion.color}}22; color: {{emotion.color}}">{{item.emotionTag}}</view>
+                <view class="like-count">♡ {{item.likeCount}}</view>
+              </view>
+            </view>
+            <view class="fav-btn">🤍</view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <button class="btn-secondary" bindtap="onFavoriteAll">收藏全部推荐</button>
+  </view>
+</view>

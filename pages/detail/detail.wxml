@@ -1,0 +1,49 @@
+<!--pages/detail/detail.wxml-->
+<view class="detail-page">
+  <!-- 色带 -->
+  <view class="color-band">
+    <block wx:for="{{palette.colors}}" wx:key="hex">
+      <view class="band-item" style="background: {{item.hex}}"></view>
+    </block>
+    <!-- 返回按钮 -->
+    <view class="nav-back-wrap">
+      <view class="nav-back" bindtap="onGoBack">←</view>
+    </view>
+    <!-- 名称 -->
+    <view class="band-title">{{palette.name}}</view>
+  </view>
+
+  <!-- 颜色详情 -->
+  <scroll-view scroll-y class="detail-scroll">
+    <view class="detail-body">
+      <block wx:for="{{palette.colors}}" wx:key="hex">
+        <view
+          class="color-row"
+          data-hex="{{item.hex}}"
+          bindtap="onCopyColor"
+        >
+          <view class="color-dot" style="background: {{item.hex}}"></view>
+          <view class="color-info">
+            <view class="color-name">{{item.name}}</view>
+            <view class="color-hex">{{item.hex}}</view>
+          </view>
+          <view class="tag" style="background: {{palette.emotionColor}}22; color: {{palette.emotionColor}}">{{item.tag}}</view>
+          <view class="copy-btn">复制</view>
+        </view>
+      </block>
+
+      <!-- 描述 -->
+      <view class="detail-desc">
+        {{palette.description}}
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="detail-actions">
+      <button class="btn-primary" bindtap="onFavorite">
+        {{favorite ? '❤️' : '♡'}} 收藏
+      </button>
+      <button class="btn-ghost" bindtap="onSaveImage">保存图片</button>
+    </view>
+  </scroll-view>
+</view>

@@ -1,0 +1,10 @@
+<!--components/color-card/color-card.wxml-->
+<view class="color-card" bindtap="onCopy">
+  <view class="color-dot" style="background: {{hex}}"></view>
+  <view class="color-info">
+    <view class="color-name">{{name}}</view>
+    <view class="color-hex">{{hex}}</view>
+  </view>
+  <view class="tag" style="background: {{tagColor}}22; color: {{tagColor}}">{{tag}}</view>
+  <view class="copy-btn">复制</view>
+</view>

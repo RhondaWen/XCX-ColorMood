@@ -1,0 +1,193 @@
+/* ============================================
+   情绪色谱 · Emotion Spectrum
+   温暖柔和 + 莫兰迪美学 + 大圆角 + 情绪色彩
+   ============================================ */
+
+/* ========== 色彩系统 ========== */
+page {
+  /* 情绪色谱主色 */
+  --orange: #F18F43;
+  --orange-light: #FEF0E3;
+  --green: #94B276;
+  --green-light: #EEF4EA;
+  --yellow: #D5DD5E;
+  --yellow-light: #FAFAE8;
+  --lavender: #C9B8E8;
+  --lavender-light: #F3EFFA;
+  --rose: #E8B4B8;
+  --smoke: #9B8EA8;
+
+  /* 背景与容器 */
+  --bg: #F9F5F0;
+  --card: #F0EBE3;
+  --divider: #D9D0C7;
+
+  /* 文字色 */
+  --text: #2C2C2C;
+  --muted: #6B6B6B;
+  --placeholder: #C8C0B8;
+  --white: #FFFFFF;
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  /* 基础设置 */
+  background: var(--bg);
+  color: var(--text);
+  font-family: "PingFang SC", "Noto Sans SC", -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ========== 页面容器 ========== */
+.page-container {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ========== 标题系统 ========== */
+.title-main {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.title-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ========== 卡片系统 ========== */
+.card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.card-white {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ========== 按钮系统 ========== */
+.btn-primary {
+  width: 100%;
+  height: 44px;
+  background: var(--orange);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.btn-primary::after { border: none; }
+
+.btn-secondary {
+  width: 100%;
+  height: 44px;
+  background: transparent;
+  color: var(--green);
+  border: 1.5px solid var(--green);
+  border-radius: var(--radius-full);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.btn-secondary::after { border: none; }
+
+.btn-ghost {
+  width: 100%;
+  height: 38px;
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--divider);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-ghost::after { border: none; }
+
+/* ========== 输入框 ========== */
+.input-field {
+  width: 100%;
+  height: 44px;
+  background: var(--card);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.input-field::placeholder { color: var(--placeholder); }
+
+/* ========== 标签 ========== */
+.tag {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tag-gentle { background: rgba(232,180,184,.2); color: #b07080; }
+.tag-vivid { background: rgba(241,143,67,.15); color: #c07020; }
+.tag-calm { background: rgba(148,178,118,.15); color: #5a7a3a; }
+.tag-melancholy { background: rgba(155,142,168,.15); color: #6a5a7a; }
+
+/* ========== 色条 ========== */
+.color-strip {
+  height: 80px;
+  display: flex;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+}
+
+.color-strip-item { flex: 1; }
+
+/* ========== 动画 ========== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-fadeInUp { animation: fadeInUp 0.3s ease forwards; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+
+/* ========== 布局辅助 ========== */
+.flex { display: flex; }
+.flex-between { justify-content: space-between; align-items: center; }
+.flex-center { align-items: center; justify-content: center; }
+.flex-column { flex-direction: column; }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.grid-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+
+/* ========== 间距 ========== */
+.p-16 { padding: 16px; }
+.px-16 { padding-left: 16px; padding-right: 16px; }
+.py-16 { padding-top: 16px; padding-bottom: 16px; }
+
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* ========== 滚动隐藏 ========== */
+scroll-view::-webkit-scrollbar { display: none; }

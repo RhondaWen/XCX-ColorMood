@@ -1,0 +1,18 @@
+<!--components/palette-card/palette-card.wxml-->
+<view class="palette-card" bindtap="onTap">
+  <view class="color-strip">
+    <block wx:for="{{colors}}" wx:key="*this">
+      <view class="strip-item" style="background: {{item}}"></view>
+    </block>
+  </view>
+  <view class="card-meta">
+    <view class="meta-left">
+      <view class="palette-name">{{name}}</view>
+      <view class="meta-bottom">
+        <view class="tag" style="background: {{emotionColor}}22; color: {{emotionColor}}">{{emotionTag}}</view>
+        <view class="like-count">♡ {{likeCount}}</view>
+      </view>
+    </view>
+    <view class="fav-btn" bindtap="onFavorite">{{favorite ? '❤️' : '🤍'}}</view>
+  </view>
+</view>

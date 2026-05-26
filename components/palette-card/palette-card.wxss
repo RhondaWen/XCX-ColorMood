@@ -1,0 +1,50 @@
+/* components/palette-card/palette-card.wxss */
+.palette-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.color-strip {
+  height: 80px;
+  display: flex;
+}
+
+.strip-item { flex: 1; }
+
+.card-meta {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.meta-left { flex: 1; }
+
+.palette-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2C2C2C;
+}
+
+.meta-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.tag {
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.like-count {
+  font-size: 12px;
+  color: #6B6B6B;
+}
+
+.fav-btn { font-size: 20px; }

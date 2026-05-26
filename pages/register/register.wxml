@@ -1,0 +1,67 @@
+<!--pages/register/register.wxml-->
+<view class="register-page">
+  <!-- Hero区域 -->
+  <view class="register-hero">
+    <view class="hero-title">创建你的账号</view>
+    <view class="hero-subtitle">从今天起，开始你的色彩记录</view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="register-form">
+    <view class="input-group">
+      <view class="input-label">用户名</view>
+      <input
+        class="input-field"
+        type="text"
+        placeholder="2-20个字符"
+        value="{{username}}"
+        bindinput="onInputUsername"
+      />
+    </view>
+
+    <view class="input-group">
+      <view class="input-label">密码</view>
+      <input
+        class="input-field"
+        type="password"
+        placeholder="6-20位，含字母和数字"
+        value="{{password}}"
+        bindinput="onInputPassword"
+      />
+    </view>
+
+    <view class="input-group">
+      <view class="input-label">确认密码</view>
+      <input
+        class="input-field"
+        type="password"
+        placeholder="再次输入密码"
+        value="{{confirmPassword}}"
+        bindinput="onInputConfirmPassword"
+      />
+    </view>
+
+    <view class="input-group">
+      <view class="input-label">邮箱（选填）</view>
+      <input
+        class="input-field"
+        type="text"
+        placeholder="用于找回密码"
+        value="{{email}}"
+        bindinput="onInputEmail"
+      />
+    </view>
+
+    <button
+      class="btn-primary"
+      loading="{{loading}}"
+      bindtap="onRegister"
+    >开始我的色彩旅程</button>
+
+    <button class="btn-ghost" bindtap="onGoLogin">已有账号，去登录</button>
+
+    <view class="agreement">
+      注册即代表同意<text class="link-highlight">用户协议</text>和<text class="link-highlight">隐私政策</text>
+    </view>
+  </view>
+</view>

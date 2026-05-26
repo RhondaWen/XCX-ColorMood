@@ -1,0 +1,41 @@
+<!--pages/gallery/gallery.wxml-->
+<view class="gallery-page">
+  <view class="section-header">
+    <view class="section-title">配色广场</view>
+    <view class="section-sub">每一种颜色都是一种情绪</view>
+  </view>
+
+  <view class="tab-bar">
+    <block wx:for="{{tabs}}" wx:key="*this">
+      <view
+        class="tab-item {{currentTab === item ? 'active' : ''}}"
+        data-tab="{{item}}"
+        bindtap="onTabChange"
+      >{{item}}</view>
+    </block>
+  </view>
+
+  <scroll-view scroll-y class="gallery-scroll" bindscrolltolower="onReachBottom">
+    <view class="palette-list">
+      <block wx:for="{{palettes}}" wx:key="id">
+        <view class="palette-card" data-id="{{item.id}}" bindtap="onPaletteDetail">
+          <view class="color-strip">
+            <block wx:for="{{item.colors}}" wx:for-item="color" wx:key="*this">
+              <view class="strip-item" style="background: {{color}}"></view>
+            </block>
+          </view>
+          <view class="card-meta">
+            <view class="meta-left">
+              <view class="palette-name">{{item.name}}</view>
+              <view class="meta-bottom">
+                <view class="tag" style="background: {{item.emotionColor}}22; color: {{item.emotionColor}}">{{item.emotionTag}}</view>
+                <view class="like-count">♡ {{item.likeCount}}</view>
+              </view>
+            </view>
+            <view class="fav-btn" bindtap="onFavorite">🤍</view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+</view>
