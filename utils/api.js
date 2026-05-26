@@ -1,65 +1,282 @@
-// utils/api.js - API请求封装与配色算法
+// utils/api.js - 云数据库API与配色算法
 
-const BASE_URL = 'https://your-server.com/api' // 替换为实际服务器地址
+const app = getApp()
+const getDb = () => wx.cloud.database()
 
-/**
- * 封装请求方法
- */
-const request = (url, method = 'GET', data = {}, needAuth = true) => {
-  return new Promise((resolve, reject) => {
-    const header = { 'content-type': 'application/json' }
-    const token = wx.getStorageSync('userToken')
+// ========== 用户相关 ==========
 
-    if (needAuth && token) {
-      header['Authorization'] = `Bearer ${token}`
+// 注册用户
+const register = async (data) => {
+  const db = getDb()
+  try {
+    // 检查用户名是否已存在
+    const existUser = await db.collection('users').where({ username: data.username }).get()
+    if (existUser.data.length > 0) {
+      return { code: -1, message: '用户名已存在' }
     }
 
-    wx.request({
-      url: `${BASE_URL}${url}`,
-      method,
-      data,
-      header,
-      success: res => {
-        if (res.statusCode === 200) {
-          resolve(res.data)
-        } else if (res.statusCode === 401) {
-          wx.removeStorageSync('userToken')
-          wx.removeStorageSync('userInfo')
-          wx.redirectTo({ url: '/pages/login/login' })
-          reject(new Error('登录已过期'))
-        } else {
-          reject(new Error('请求失败'))
-        }
-      },
-      fail: () => reject(new Error('网络连接失败'))
+    // 创建新用户
+    const res = await db.collection('users').add({
+      data: {
+        username: data.username,
+        password: data.password,
+        email: data.email || '',
+        avatar: '🌸',
+        createTime: db.serverDate(),
+        favorites: [],
+        checkinDays: 0
+      }
     })
-  })
+    return { code: 0, data: { _id: res._id, username: data.username } }
+  } catch (err) {
+    return { code: -1, message: '注册失败' }
+  }
 }
 
-// 用户相关API
-const register = (data) => request('/user/register', 'POST', data, false)
-const login = (data) => request('/user/login', 'POST', data, false)
-const getUserInfo = () => request('/user/profile', 'GET')
-const getFavorites = () => request('/user/favorites', 'GET')
+// 登录
+const login = async (data) => {
+  const db = getDb()
+  try {
+    const res = await db.collection('users')
+      .where({
+        username: data.username,
+        password: data.password
+      })
+      .get()
 
-// 配色相关API
-const getPaletteList = (params) => request('/palette/list', 'GET', params)
-const getPaletteGallery = (params) => request('/palette/gallery', 'GET', params)
-const getPaletteDetail = (id) => request(`/palette/detail/${id}`, 'GET')
-const favoritePalette = (data) => request('/palette/favorite', 'POST', data)
-const savePalette = (data) => request('/palette/save', 'POST', data)
+    if (res.data.length === 0) {
+      return { code: -1, message: '用户名或密码错误' }
+    }
 
-// 打卡相关API
-const checkin = (data) => request('/mood/checkin', 'POST', data)
-const getCheckinHistory = (params) => request('/mood/history', 'GET', params)
+    const user = res.data[0]
+    return { code: 0, data: user }
+  } catch (err) {
+    return { code: -1, message: '登录失败' }
+  }
+}
 
-// 颜色命名API（The Color API）
+// 获取用户信息
+const getUserInfo = async () => {
+  const userInfo = wx.getStorageSync('userInfo')
+  if (!userInfo || !userInfo._id) return { code: -1, message: '未登录' }
+
+  const db = getDb()
+  try {
+    const res = await db.collection('users').doc(userInfo._id).get()
+    return { code: 0, data: res.data }
+  } catch (err) {
+    return { code: -1, message: '获取失败' }
+  }
+}
+
+// ========== 配色相关 ==========
+
+// 获取色板列表（按情绪筛选）
+const getPaletteList = async (params) => {
+  const db = getDb()
+  try {
+    let query = db.collection('palettes')
+    if (params && params.emotionId) {
+      const emotionMap = { 1: '温柔', 2: '活力', 3: '沉静', 4: '忧郁' }
+      query = query.where({ emotionTag: emotionMap[params.emotionId] })
+    }
+
+    const res = await query.limit(20).get()
+    return { code: 0, data: res.data }
+  } catch (err) {
+    return { code: -1, message: '获取失败' }
+  }
+}
+
+// 获取广场色板
+const getPaletteGallery = async (params) => {
+  const db = getDb()
+  try {
+    let query = db.collection('palettes')
+    if (params && params.tag && params.tag !== '全部') {
+      query = query.where({ emotionTag: params.tag })
+    }
+
+    const res = await query.orderBy('likeCount', 'desc').limit(20).get()
+    return { code: 0, data: res.data }
+  } catch (err) {
+    return { code: -1, message: '获取失败' }
+  }
+}
+
+// 获取色板详情
+const getPaletteDetail = async (id) => {
+  const db = getDb()
+  try {
+    const res = await db.collection('palettes').doc(id).get()
+    return { code: 0, data: res.data }
+  } catch (err) {
+    return { code: -1, message: '获取失败' }
+  }
+}
+
+// 收藏色板
+const favoritePalette = async (paletteId) => {
+  const userInfo = wx.getStorageSync('userInfo')
+  if (!userInfo || !userInfo._id) return { code: -1, message: '未登录' }
+
+  const db = getDb()
+  try {
+    // 获取用户当前收藏
+    const userRes = await db.collection('users').doc(userInfo._id).get()
+    const favorites = userRes.data.favorites || []
+
+    // 判断是否已收藏
+    const idx = favorites.indexOf(paletteId)
+    if (idx > -1) {
+      favorites.splice(idx, 1) // 取消收藏
+    } else {
+      favorites.push(paletteId) // 添加收藏
+    }
+
+    // 更新用户收藏
+    await db.collection('users').doc(userInfo._id).update({
+      data: { favorites }
+    })
+
+    // 更新色板点赞数
+    const paletteRes = await db.collection('palettes').doc(paletteId).get()
+    const likeCount = paletteRes.data.likeCount || 0
+    await db.collection('palettes').doc(paletteId).update({
+      data: { likeCount: idx > -1 ? likeCount - 1 : likeCount + 1 }
+    })
+
+    return { code: 0, data: { favorites } }
+  } catch (err) {
+    return { code: -1, message: '操作失败' }
+  }
+}
+
+// 保存自定义色板
+const savePalette = async (data) => {
+  const userInfo = wx.getStorageSync('userInfo')
+  if (!userInfo || !userInfo._id) return { code: -1, message: '未登录' }
+
+  const db = getDb()
+  try {
+    const res = await db.collection('palettes').add({
+      data: {
+        name: data.name,
+        colors: data.colors,
+        emotionTag: data.emotionTag || '自定义',
+        likeCount: 0,
+        userId: userInfo._id,
+        createTime: db.serverDate()
+      }
+    })
+    return { code: 0, data: { _id: res._id } }
+  } catch (err) {
+    return { code: -1, message: '保存失败' }
+  }
+}
+
+// ========== 打卡相关 ==========
+
+// 情绪打卡
+const checkin = async (data) => {
+  const userInfo = wx.getStorageSync('userInfo')
+  if (!userInfo || !userInfo._id) return { code: -1, message: '未登录' }
+
+  const db = getDb()
+  const today = new Date().toISOString().slice(0, 10)
+
+  try {
+    // 检查今日是否已打卡
+    const existRes = await db.collection('checkins')
+      .where({
+        userId: userInfo._id,
+        date: today
+      })
+      .get()
+
+    if (existRes.data.length > 0) {
+      return { code: -1, message: '今日已打卡' }
+    }
+
+    // 添加打卡记录
+    await db.collection('checkins').add({
+      data: {
+        userId: userInfo._id,
+        date: today,
+        emotionTag: data.emotionTag,
+        emotionId: data.emotionId,
+        colorHex: data.colorHex,
+        paletteId: data.paletteId || null,
+        createTime: db.serverDate()
+      }
+    })
+
+    // 更新用户打卡天数
+    const userRes = await db.collection('users').doc(userInfo._id).get()
+    await db.collection('users').doc(userInfo._id).update({
+      data: { checkinDays: (userRes.data.checkinDays || 0) + 1 }
+    })
+
+    return { code: 0, message: '打卡成功' }
+  } catch (err) {
+    return { code: -1, message: '打卡失败' }
+  }
+}
+
+// 获取打卡历史
+const getCheckinHistory = async (params) => {
+  const userInfo = wx.getStorageSync('userInfo')
+  if (!userInfo || !userInfo._id) return { code: -1, message: '未登录' }
+
+  const db = getDb()
+  try {
+    const res = await db.collection('checkins')
+      .where({
+        userId: userInfo._id
+      })
+      .orderBy('date', 'desc')
+      .limit(50)
+      .get()
+
+    return { code: 0, data: res.data }
+  } catch (err) {
+    return { code: -1, message: '获取失败' }
+  }
+}
+
+// 获取用户收藏列表
+const getFavorites = async () => {
+  const userInfo = wx.getStorageSync('userInfo')
+  if (!userInfo || !userInfo._id) return { code: -1, message: '未登录' }
+
+  const db = getDb()
+  try {
+    const userRes = await db.collection('users').doc(userInfo._id).get()
+    const favorites = userRes.data.favorites || []
+
+    if (favorites.length === 0) {
+      return { code: 0, data: [] }
+    }
+
+    // 批量获取收藏的色板
+    const paletteRes = await db.collection('palettes')
+      .where({ _id: db.command.in(favorites) })
+      .get()
+
+    return { code: 0, data: paletteRes.data }
+  } catch (err) {
+    return { code: -1, message: '获取失败' }
+  }
+}
+
+// ========== 颜色命名API ==========
+
 const getColorName = (hex) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     wx.request({
       url: `https://www.thecolorapi.com/id?hex=${hex.replace('#', '')}`,
       method: 'GET',
-      success: res => {
+      success: (res) => {
         if (res.data && res.data.name) {
           resolve({ name: res.data.name.value })
         } else {
@@ -71,7 +288,8 @@ const getColorName = (hex) => {
   })
 }
 
-// 配色生成算法
+// ========== 配色算法 ==========
+
 const hexToHsl = (hex) => {
   let r = parseInt(hex.slice(1, 3), 16) / 255
   let g = parseInt(hex.slice(3, 5), 16) / 255

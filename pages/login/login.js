@@ -1,4 +1,6 @@
-// pages/login/login.js
+// pages/login/login.js - 云开发版本
+const api = require('../../utils/api')
+
 Page({
   data: {
     username: '',
@@ -14,25 +16,36 @@ Page({
     this.setData({ password: e.detail.value })
   },
 
-  onLogin() {
+  async onLogin() {
     const { username, password } = this.data
 
-    // 模拟登录 - 直接跳转首页
-    const mockUserInfo = {
-      username: username || '用户',
-      avatar: '🌸'
+    if (!username.trim()) {
+      wx.showToast({ title: '请输入用户名', icon: 'none' })
+      return
     }
-    wx.setStorageSync('userInfo', mockUserInfo)
-    wx.setStorageSync('userToken', 'mock_token')
+    if (!password) {
+      wx.showToast({ title: '请输入密码', icon: 'none' })
+      return
+    }
 
-    wx.showToast({ title: '登录成功', icon: 'success' })
-    setTimeout(() => {
-      wx.switchTab({ url: '/pages/home/home' })
-    }, 1000)
+    this.setData({ loading: true })
+
+    const res = await api.login({ username, password })
+    this.setData({ loading: false })
+
+    if (res.code === 0) {
+      wx.setStorageSync('userInfo', res.data)
+      wx.showToast({ title: '登录成功', icon: 'success' })
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/home/home' })
+      }, 1000)
+    } else {
+      wx.showToast({ title: res.message || '登录失败', icon: 'none' })
+    }
   },
 
   onSkipLogin() {
-    wx.setStorageSync('userInfo', { username: '游客', avatar: '🎨' })
+    wx.setStorageSync('userInfo', { username: '游客', avatar: '🎨', isGuest: true })
     wx.switchTab({ url: '/pages/home/home' })
   },
 

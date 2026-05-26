@@ -1,46 +1,49 @@
-// pages/mine/mine.js
+// pages/mine/mine.js - 云开发版本
 const api = require('../../utils/api')
 
 Page({
   data: {
     userInfo: null,
+    isGuest: false,
     checkinDays: 0,
     favoritesCount: 0,
     currentMonth: '',
     calendarData: [],
     favorites: [],
-    emotionColors: {
-      '温柔': '#E8B4B8',
-      '活力': '#F18F43',
-      '沉静': '#94B276',
-      '忧郁': '#9B8EA8'
-    }
+    emotionColors: { '温柔': '#E8B4B8', '活力': '#F18F43', '沉静': '#94B276', '忧郁': '#9B8EA8' }
   },
 
-  onLoad() {
-    this.initUserInfo()
-    this.initCalendar()
-    this.loadFavorites()
-  },
-
-  onShow() {
-    this.initUserInfo()
-  },
+  onLoad() { this.initUserInfo(); this.initCalendar(); this.loadFavorites() },
+  onShow() { this.initUserInfo() },
 
   initUserInfo() {
     const userInfo = wx.getStorageSync('userInfo')
     if (userInfo) {
       this.setData({
         userInfo,
-        checkinDays: userInfo.checkinDays || 23,
-        favoritesCount: userInfo.favoritesCount || 12
+        isGuest: userInfo.isGuest || false,
+        checkinDays: userInfo.checkinDays || 0,
+        favoritesCount: (userInfo.favorites || []).length
       })
-    } else {
-      wx.redirectTo({ url: '/pages/login/login' })
+      this.loadCheckinHistory()
+    }
+  },
+
+  async loadCheckinHistory() {
+    if (this.data.isGuest) return
+    const res = await api.getCheckinHistory()
+    if (res.code === 0) {
+      this.buildCalendar(res.data)
     }
   },
 
   initCalendar() {
+    const now = new Date()
+    this.setData({ currentMonth: `${now.getFullYear()}年 ${now.getMonth() + 1}月` })
+    this.buildCalendar([])
+  },
+
+  buildCalendar(checkins) {
     const now = new Date()
     const year = now.getFullYear()
     const month = now.getMonth() + 1
@@ -48,67 +51,47 @@ Page({
     const daysInMonth = new Date(year, month, 0).getDate()
     const today = now.getDate()
 
-    // 模拟打卡数据
-    const checkinData = {
-      1: '#E8B4B8', 2: '#F18F43', 4: '#94B276', 5: '#9B8EA8', 7: '#E8B4B8',
-      8: '#94B276', 10: '#F18F43', 11: '#E8B4B8', 13: '#9B8EA8', 14: '#94B276',
-      15: '#E8B4B8', 17: '#F18F43', 18: '#94B276', 20: '#9B8EA8', 21: '#E8B4B8',
-      22: '#F18F43', 24: '#94B276', 25: '#9B8EA8'
-    }
+    const checkinMap = {}
+    checkins.forEach(c => {
+      const d = parseInt(c.date.slice(8))
+      checkinMap[d] = this.data.emotionColors[c.emotionTag] || '#E8B4B8'
+    })
 
     const calendar = []
-    for (let i = 0; i < firstDay; i++) {
-      calendar.push({ empty: true })
-    }
+    for (let i = 0; i < firstDay; i++) calendar.push({ empty: true })
     for (let d = 1; d <= daysInMonth; d++) {
       calendar.push({
         day: d,
-        color: checkinData[d] || '#E8E0D8',
-        checked: !!checkinData[d],
+        color: checkinMap[d] || '#E8E0D8',
+        checked: !!checkinMap[d],
         today: d === today
       })
     }
-
-    this.setData({
-      currentMonth: `${year}年 ${month}月`,
-      calendarData: calendar
-    })
+    this.setData({ calendarData: calendar })
   },
 
-  loadFavorites() {
-    // 模拟收藏数据
-    const favorites = [
-      { id: 1, name: '初春晨雾', colors: ['#E8B4B8', '#C9B8E8', '#F9F0E0'] },
-      { id: 2, name: '暮光晚橙', colors: ['#F18F43', '#D5DD5E', '#F0C860'] },
-      { id: 3, name: '苔原初绿', colors: ['#94B276', '#A8C488', '#C8DCA8'] },
-      { id: 4, name: '温暖米麻', colors: ['#F5C5A3', '#E8D5B7', '#D4BFA0'] }
-    ]
-    this.setData({ favorites })
-  },
-
-  onPrevMonth() {
-    wx.showToast({ title: '上个月', icon: 'none' })
-  },
-
-  onNextMonth() {
-    wx.showToast({ title: '下个月', icon: 'none' })
-  },
-
-  onCalendarDay(e) {
-    const { day, checked } = e.currentTarget.dataset
-    if (checked) {
-      wx.showToast({ title: `${day}日已打卡`, icon: 'none' })
+  async loadFavorites() {
+    if (this.data.isGuest) return
+    const res = await api.getFavorites()
+    if (res.code === 0) {
+      const favorites = res.data.slice(0, 4).map(p => ({
+        _id: p._id,
+        name: p.name,
+        colors: p.colors.slice(0, 3)
+      }))
+      this.setData({ favorites, favoritesCount: res.data.length })
     }
   },
+
+  onPrevMonth() { wx.showToast({ title: '上月数据', icon: 'none' }) },
+  onNextMonth() { wx.showToast({ title: '下月数据', icon: 'none' }) },
 
   onFavoriteDetail(e) {
     const { id } = e.currentTarget.dataset
     wx.navigateTo({ url: `/pages/detail/detail?id=${id}` })
   },
 
-  onViewAllFavorites() {
-    wx.switchTab({ url: '/pages/gallery/gallery' })
-  },
+  onViewAllFavorites() { wx.switchTab({ url: '/pages/gallery/gallery' }) },
 
   onLogout() {
     wx.showModal({
@@ -116,7 +99,6 @@ Page({
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.removeStorageSync('userToken')
           wx.removeStorageSync('userInfo')
           wx.redirectTo({ url: '/pages/login/login' })
         }

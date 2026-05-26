@@ -1,41 +1,43 @@
-// app.js - 情绪色谱
+// app.js - 情绪色谱（云开发版本）
 App({
   globalData: {
     userInfo: null,
     isLoggedIn: false,
-    token: ''
+    cloudEnv: 'cloud1-d1gyppvig53f8f1f4'
   },
 
   onLaunch() {
+    // 初始化云开发
+    wx.cloud.init({
+      env: this.globalData.cloudEnv,
+      traceUser: true
+    })
+
     this.checkLoginStatus()
   },
 
   checkLoginStatus() {
     const userInfo = wx.getStorageSync('userInfo')
-    const token = wx.getStorageSync('userToken')
-
-    if (userInfo && token) {
+    if (userInfo) {
       this.globalData.userInfo = userInfo
-      this.globalData.token = token
       this.globalData.isLoggedIn = true
     }
   },
 
-  loginSuccess(userInfo, token) {
+  loginSuccess(userInfo) {
     this.globalData.userInfo = userInfo
-    this.globalData.token = token
     this.globalData.isLoggedIn = true
-
     wx.setStorageSync('userInfo', userInfo)
-    wx.setStorageSync('userToken', token)
   },
 
   logout() {
     this.globalData.userInfo = null
-    this.globalData.token = ''
     this.globalData.isLoggedIn = false
-
     wx.removeStorageSync('userInfo')
-    wx.removeStorageSync('userToken')
+  },
+
+  // 获取云数据库实例
+  getDb() {
+    return wx.cloud.database()
   }
 })
