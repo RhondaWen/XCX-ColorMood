@@ -1,0 +1,68 @@
+<view class="container">
+  <view class="text-section" style="text-align:center;">
+   <view class="title">情绪色谱</view>
+   <view class="subtitle">于色中，窥见万物灵韵</view>
+  </view>
+
+  <!-- 进入小程序按钮（在图案上方） -->
+  <view class="button-wrap">
+    <button class="enter-btn" bindtap="goToLogin">进入小程序</button>
+  </view>
+
+  <!-- 所有卡通图案 -->
+  <view class="shape-area">
+    <view class="shape shape-pink-clover">
+      <view class="petal-1"></view>
+      <view class="petal-2"></view>
+      <view class="center"></view>
+      <view class="eye eye-star"></view>
+      <view class="eye eye-star"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-orange-square">
+      <view class="eye eye-circle"></view>
+      <view class="eye eye-circle"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-orange-circle">
+      <view class="eye eye-big"></view>
+      <view class="eye eye-big"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-yellow-blob">
+      <view class="eye eye-v"></view>
+      <view class="eye eye-v"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-cyan-diamond">
+      <view class="eye eye-wink"></view>
+      <view class="eye eye-wink"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-pink-teardrop">
+      <view class="eye"></view>
+      <view class="eye"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-red-slant">
+      <view class="eye eye-heart"></view>
+      <view class="eye eye-heart"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-blue-penta">
+      <view class="eye eye-penta"></view>
+      <view class="eye eye-penta"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-cyan-triangle">
+      <view class="eye"></view>
+      <view class="eye"></view>
+      <view class="mouth"></view>
+    </view>
+    <view class="shape shape-blue-cloud">
+      <view class="eye eye-sleep"></view>
+      <view class="eye eye-sleep"></view>
+      <view class="mouth"></view>
+    </view>
+  </view>
+</view>
