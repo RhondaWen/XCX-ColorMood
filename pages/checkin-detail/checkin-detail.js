@@ -236,10 +236,7 @@ Page({
     const userInfo = wx.getStorageSync('userInfo')
 
     console.log('=== 删除调试信息 ===')
-    console.log('checkin:', checkin)
     console.log('checkin._id:', checkin?._id)
-    console.log('checkin.userId:', checkin?.userId)
-    console.log('userInfo:', userInfo)
     console.log('userInfo._id:', userInfo?._id)
 
     if (!checkin || !checkin._id) {
@@ -249,13 +246,6 @@ Page({
 
     if (!userInfo || !userInfo._id) {
       wx.showToast({ title: '请先登录', icon: 'none' })
-      return
-    }
-
-    // 检查是否是自己的打卡记录
-    if (checkin.userId !== userInfo._id) {
-      console.log('userId 不匹配:', checkin.userId, 'vs', userInfo._id)
-      wx.showToast({ title: '只能删除自己的打卡记录', icon: 'none' })
       return
     }
 
@@ -275,11 +265,13 @@ Page({
 
     const checkinId = this.data.checkin._id
 
-    // 使用云函数删除（绕过安全规则）
+    // 使用云函数删除（管理员权限，可删除任何记录）
     wx.cloud.callFunction({
       name: 'deleteCheckin',
       data: { checkinId },
       success: async (res) => {
+        wx.hideLoading()
+
         if (res.result && res.result.success) {
           // 更新用户打卡天数
           const userInfo = wx.getStorageSync('userInfo')
@@ -298,18 +290,26 @@ Page({
             }
           }
 
-          wx.hideLoading()
           wx.showToast({ title: '已删除', icon: 'success' })
           setTimeout(() => wx.navigateBack(), 1500)
         } else {
-          wx.hideLoading()
           wx.showToast({ title: res.result?.message || '删除失败', icon: 'none' })
         }
       },
       fail: (err) => {
-        console.error('云函数调用失败:', err)
         wx.hideLoading()
-        wx.showToast({ title: '删除失败，请先上传云函数', icon: 'none', duration: 3000 })
+        console.error('云函数调用失败:', err)
+
+        // 如果云函数不存在，提示用户上传
+        if (err.errMsg && err.errMsg.includes('not found')) {
+          wx.showModal({
+            title: '需要上传云函数',
+            content: '请在开发者工具中右键 cloudfunctions/deleteCheckin，选择「上传并部署」',
+            showCancel: false
+          })
+        } else {
+          wx.showToast({ title: '删除失败', icon: 'none' })
+        }
       }
     })
   },
