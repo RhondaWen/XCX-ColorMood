@@ -231,40 +231,52 @@ Page({
     }
   },
 
-  async onDeleteCheckin() {
+  onDeleteCheckin() {
+    if (!this.data.checkin || !this.data.checkin._id) {
+      wx.showToast({ title: '记录不存在', icon: 'none' })
+      return
+    }
+
     wx.showModal({
       title: '确认删除',
       content: '确定要删除这条打卡记录吗？',
-      success: async (res) => {
+      success: (res) => {
         if (res.confirm) {
-          wx.showLoading({ title: '删除中...' })
-
-          const db = wx.cloud.database()
-          try {
-            await db.collection('checkins').doc(this.data.checkin._id).remove()
-
-            // 更新用户打卡天数
-            const userInfo = wx.getStorageSync('userInfo')
-            if (userInfo && userInfo._id) {
-              const userRes = await db.collection('users').doc(userInfo._id).get()
-              const newDays = Math.max(0, (userRes.data.checkinDays || 1) - 1)
-              await db.collection('users').doc(userInfo._id).update({
-                data: { checkinDays: newDays }
-              })
-              userInfo.checkinDays = newDays
-              wx.setStorageSync('userInfo', userInfo)
-            }
-
-            wx.hideLoading()
-            wx.showToast({ title: '已删除', icon: 'success' })
-            setTimeout(() => wx.navigateBack(), 1500)
-          } catch (err) {
-            wx.hideLoading()
-            wx.showToast({ title: '删除失败', icon: 'error' })
-          }
+          this.doDeleteCheckin()
         }
       }
     })
+  },
+
+  async doDeleteCheckin() {
+    wx.showLoading({ title: '删除中...', mask: true })
+
+    const db = wx.cloud.database()
+    const userInfo = wx.getStorageSync('userInfo')
+
+    try {
+      // 删除打卡记录
+      await db.collection('checkins').doc(this.data.checkin._id).remove()
+
+      // 更新用户打卡天数
+      if (userInfo && userInfo._id) {
+        const userRes = await db.collection('users').doc(userInfo._id).get()
+        const newDays = Math.max(0, (userRes.data.checkinDays || 1) - 1)
+        await db.collection('users').doc(userInfo._id).update({
+          data: { checkinDays: newDays }
+        })
+        userInfo.checkinDays = newDays
+        wx.setStorageSync('userInfo', userInfo)
+      }
+
+      wx.hideLoading()
+      wx.showToast({ title: '已删除', icon: 'success' })
+      setTimeout(() => wx.navigateBack(), 1500)
+    } catch (err) {
+      console.error('删除失败', err)
+      wx.hideLoading()
+      wx.showToast({ title: '删除失败: ' + (err.message || '未知错误'), icon: 'none' })
+    }
   },
 
   formatDate(dateStr) {
