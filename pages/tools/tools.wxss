@@ -62,6 +62,139 @@
   margin-bottom: 12px;
 }
 
+/* 拍照取色色卡区域 */
+.photo-color-section {
+  margin: 0 16px 12px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.photo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.photo-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2C2C2C;
+}
+
+.photo-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #6B6B6B;
+  background: #F0EBE3;
+  border-radius: 50%;
+}
+
+.photo-desc {
+  font-size: 12px;
+  color: #6B6B6B;
+  margin-bottom: 12px;
+}
+
+.color-strip-card {
+  background: #F9F5F0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* 色条 */
+.color-strip {
+  height: 60px;
+  display: flex;
+}
+
+.strip-item {
+  flex: 1;
+}
+
+.strip-item:active {
+  opacity: 0.85;
+}
+
+.strip-meta {
+  padding: 12px;
+}
+
+.color-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.color-info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-info-item:active {
+  opacity: 0.7;
+}
+
+.color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.color-text {
+  flex: 1;
+}
+
+.color-hex {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2C2C2C;
+}
+
+.color-name {
+  font-size: 11px;
+  color: #6B6B6B;
+}
+
+.color-ratio {
+  font-size: 12px;
+  color: #F18F43;
+  font-weight: 500;
+}
+
+/* 保存色卡按钮 */
+.save-card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, #F18F43 0%, #F5B971 100%);
+  border-radius: 12px;
+}
+
+.save-card-btn:active {
+  opacity: 0.85;
+}
+
+.save-icon {
+  font-size: 18px;
+}
+
+.save-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
 .color-input-row {
   display: flex;
   gap: 8px;

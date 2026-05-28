@@ -5,11 +5,12 @@
     <view class="section-sub">让颜色为你服务</view>
   </view>
 
+  <!-- 摇一摇 + 配色生成器（关联） -->
   <view class="shake-card" bindtap="onManualShake">
     <view class="shake-icon">📱</view>
     <view class="shake-text">
       <view class="shake-title">摇一摇，随机配色</view>
-      <view class="shake-desc">晃动手机 · 生成莫兰迪配色</view>
+      <view class="shake-desc">晃动手机 · 生成本色 · 配色方案</view>
     </view>
     <view class="shake-arrow">→</view>
   </view>
@@ -40,12 +41,49 @@
     </view>
   </view>
 
+  <!-- 拍照取色色卡（独立显示，不关联配色生成器） -->
+  <view class="photo-color-section" wx:if="{{photoColorCard.length > 0}}">
+    <view class="photo-header">
+      <view class="photo-title">📷 拍照取色结果</view>
+      <view class="photo-close" bindtap="onClearPhotoCard">×</view>
+    </view>
+    <view class="photo-desc">点击颜色可复制 HEX 值</view>
+    <!-- 色条（类似 result 页面） -->
+    <view class="color-strip-card">
+      <view class="color-strip">
+        <block wx:for="{{photoColorCard}}" wx:key="hex">
+          <view class="strip-item" style="background: {{item.hex}}; flex: {{item.ratio}}" data-color="{{item.hex}}" bindtap="onCopyColor"></view>
+        </block>
+      </view>
+      <view class="strip-meta">
+        <view class="color-list">
+          <block wx:for="{{photoColorCard}}" wx:key="hex">
+            <view class="color-info-item" data-color="{{item.hex}}" bindtap="onCopyColor">
+              <view class="color-dot" style="background: {{item.hex}}"></view>
+              <view class="color-text">
+                <view class="color-hex">{{item.hex}}</view>
+                <view class="color-name">{{item.name}}</view>
+              </view>
+              <view class="color-ratio">{{item.ratio}}%</view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+    <!-- 保存按钮 -->
+    <view class="save-card-btn" bindtap="onSavePhotoCard">
+      <view class="save-icon">💾</view>
+      <view class="save-text">保存色卡</view>
+    </view>
+  </view>
+
+  <!-- 更多工具入口 -->
   <view class="tools-header">更多工具</view>
   <view class="tools-grid">
     <view class="tool-card" bindtap="onTakePhoto">
       <view class="tool-icon" style="background: rgba(241,143,67,.15)">📷</view>
       <view class="tool-name">拍照取色</view>
-      <view class="tool-desc">从照片中提取你的专属配色</view>
+      <view class="tool-desc">从照片中提取你的专属色卡</view>
     </view>
     <view class="tool-card" bindtap="onGoCanvas">
       <view class="tool-icon" style="background: rgba(148,178,118,.15)">🖌️</view>
