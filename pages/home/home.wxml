@@ -18,9 +18,11 @@
         data-id="{{item.id}}"
         bindtap="onSelectEmotion"
       >
-        <view class="emotion-icon" style="background: {{item.bgColor}}">
-          <text>{{item.icon}}</text>
-        </view>
+      <view class="emotion-icon {{item.iconClass}}">
+  <view class="eye"></view>   <!-- 左眼 -->
+  <view class="eye"></view>   <!-- 右眼 -->
+  <view class="mouth"></view> <!-- 嘴巴 -->
+      </view>
         <view class="emotion-name">{{item.name}}</view>
         <view class="emotion-name-en">{{item.nameEn}}</view>
         <view class="emotion-desc">{{item.desc}}</view>
@@ -29,10 +31,10 @@
   </view>
 
   <!-- 每日打卡 -->
-  <view class="checkin-bar" bindtap="onCheckin">
+  <view class="checkin-bar {{checkedIn ? 'checked' : ''}}" bindtap="onCheckin">
     <view class="checkin-info">
-      <view class="checkin-label">今日情绪色打卡</view>
-      <view class="checkin-sub">记录你此刻的色彩</view>
+      <view class="checkin-label">{{checkedIn ? '今日已打卡' : '今日情绪色打卡'}}</view>
+      <view class="checkin-sub">{{checkedIn ? '记录你此刻的色彩' : '记录你此刻的色彩'}}</view>
     </view>
     <view class="checkin-arrow">→</view>
   </view>

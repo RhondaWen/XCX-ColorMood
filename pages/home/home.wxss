@@ -77,14 +77,12 @@
 }
 
 .emotion-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
+  width: 80rpx;
+  height: 80rpx;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  position: relative;
   z-index: 1;
 }
 
@@ -145,4 +143,226 @@
 .checkin-arrow {
   color: #fff;
   font-size: 20px;
+}
+
+/* ====================== 可爱图案 ====================== */
+/* 6. 粉色碗形 */
+.shape-pink-teardrop {
+  width: 60rpx;
+  height: 40rpx;
+  background: #f962e7;
+  border-radius: 50% 50% 50% 50% / 25% 25% 75% 75%;
+  position: relative;
+  z-index: 4;
+}
+.shape-pink-teardrop .eye {
+  width: 16rpx;
+  height: 16rpx;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 20%;
+}
+.shape-pink-teardrop .eye::after {
+  content: "";
+  width: 10rpx;
+  height: 10rpx;
+  background: #000;
+  border-radius: 50%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.shape-pink-teardrop .eye:nth-child(1) { left: 14rpx; }
+.shape-pink-teardrop .eye:nth-child(2) { right: 14rpx; }
+.shape-pink-teardrop .mouth {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  font-size: 18rpx;
+  color: #000;
+  font-weight: bold;
+  transform: translateX(-50%);
+}
+.shape-pink-teardrop .mouth::after {
+  content: "ε";
+}
+
+/* 7. 红色斜方形 */
+.shape-red-slant {
+  width: 60rpx;
+  height: 44rpx;
+  background: #f56e6e;
+  border-radius: 10rpx;
+  position: relative;
+  transform: rotate(0deg);
+  z-index: 4;
+}
+.shape-red-slant .eye {
+  width: 18rpx;
+  height: 18rpx;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 25%;
+}
+.shape-red-slant .eye::after {
+  content: "";
+  width: 10rpx;
+  height: 10rpx;
+  background: #000;
+  border-radius: 50%;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.shape-red-slant .eye:nth-child(1) { left: 12rpx; }
+.shape-red-slant .eye:nth-child(2) { right: 12rpx; }
+.shape-red-slant .mouth {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 20rpx;
+  color: #000;
+  font-weight: 600;
+  transform: translateX(-50%);
+}
+.shape-red-slant .mouth::after {
+  content: "⤙";
+  font-size: 22rpx;
+}
+
+/* 8. 蓝色五边形 */
+.shape-blue-penta {
+  width: 56rpx;
+  height: 56rpx;
+  background: #3a80e1;
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  position: relative;
+  z-index: 3;
+}
+.shape-blue-penta .eye {
+  width: 16rpx;
+  height: 16rpx;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 38% !important;
+}
+.shape-blue-penta .eye::after {
+  content: "";
+  width: 8rpx;
+  height: 8rpx;
+  background: #000;
+  border-radius: 50%;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.shape-blue-penta .eye:nth-child(1) { left: 10rpx; }
+.shape-blue-penta .eye:nth-child(2) { right: 10rpx; }
+.shape-blue-penta .mouth {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20rpx;
+  color: #000;
+  font-weight: bold;
+}
+.shape-blue-penta .mouth::after {
+  content: "^";
+}
+
+/* 9. 黄色三角形 */
+.shape-cyan-triangle {
+  width: 60rpx;
+  height: 50rpx;
+  background: #FFE066;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  position: relative;
+  z-index: 2;
+}
+.shape-cyan-triangle .eye {
+  width: 18rpx;
+  height: 18rpx;
+  top: 22rpx;
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+}
+.shape-cyan-triangle .eye::after {
+  content: "";
+  position: absolute;
+  width: 12rpx;
+  height: 12rpx;
+  background: #000;
+  border-radius: 50%;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.shape-cyan-triangle .eye:nth-child(1) { left: 14rpx; }
+.shape-cyan-triangle .eye:nth-child(2) { right: 14rpx; }
+.shape-cyan-triangle .mouth {
+  position: absolute;
+  top: 30rpx;
+  left: 52%;
+  transform: translateX(-50%);
+  font-size: 20rpx;
+  font-weight: bold;
+  color: #000;
+}
+.shape-cyan-triangle .mouth::after {
+  content: "ᴥ";
+}
+
+/* ====================== ✅ 沉静 · 绿色方形（黑眼珠已修复） ====================== */
+.shape-orange-square {
+  width: 60rpx !important;
+  height: 50rpx !important;
+  background: #AED9AF;
+  border-radius: 12rpx;
+  position: relative;
+  z-index: 3;
+}
+.shape-orange-square .eye {
+  width: 18rpx;
+  height: 18rpx;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+}
+.shape-orange-square .eye::after {
+  content: "";
+  width: 10rpx;
+  height: 10rpx;
+  background: #000;
+  border-radius: 50%;
+  position: absolute;
+  left: 4rpx;
+  top: 4rpx;
+}
+.shape-orange-square .eye:nth-child(1) {
+  left: 10rpx;
+  top: 10rpx;
+}
+.shape-orange-square .eye:nth-child(2) {
+  right: 10rpx;
+  top: 10rpx;
+}
+.shape-orange-square .mouth {
+  position: absolute;
+  top: 26rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16rpx;
+  color: #000;
+  font-weight: bold;
+}
+.shape-orange-square .mouth::after {
+  content: "_";
+  font-weight: 900;
 }

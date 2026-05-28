@@ -6,10 +6,15 @@ Page({
   data: {
     baseColor: '#F18F43',
     mode: 'complementary',
-    modes: [{ key: 'complementary', name: '互补色' }, { key: 'analogous', name: '类似色' }, { key: 'triadic', name: '三角配色' }, { key: 'morandi', name: '莫兰迪化' }],
+    modes: [
+      { key: 'complementary', name: '互补色' },
+      { key: 'analogous', name: '类似色' },
+      { key: 'triadic', name: '三角配色' },
+      { key: 'morandi', name: '莫兰迪化' }
+    ],
     generatedColors: [],
     shakeListening: false,
-    photoColorCard: []  // 拍照提取的色卡（不关联配色生成器）
+    photoColorCard: []  // 拍照提取的色卡
   },
 
   onLoad() {
@@ -17,10 +22,16 @@ Page({
     this.startAccelerometer()
   },
 
-  onUnload() { this.stopAccelerometer() },
+  onUnload() {
+    this.stopAccelerometer()
+  },
 
+  // ==========================
+  // 配色生成器
+  // ==========================
   onColorChange(e) {
-    this.setData({ baseColor: e.detail.value })
+    const color = e.detail.value
+    this.setData({ baseColor: color })
     this.generateColors()
   },
 
@@ -33,7 +44,8 @@ Page({
   },
 
   onModeChange(e) {
-    this.setData({ mode: e.currentTarget.dataset.mode })
+    const { mode } = e.currentTarget.dataset
+    this.setData({ mode })
     this.generateColors()
   },
 
@@ -42,7 +54,9 @@ Page({
     this.setData({ generatedColors: colors })
   },
 
-  // 拍照取色 - 独立显示色卡，不关联配色生成器
+  // ==========================
+  // 拍照取色（完整功能：提取色卡 + 保存）
+  // ==========================
   onTakePhoto() {
     wx.chooseMedia({
       count: 1,
@@ -67,8 +81,8 @@ Page({
           height: 200
         })
         const ctx = canvas.getContext('2d')
-
         const img = canvas.createImage()
+
         img.onload = () => {
           const scale = Math.min(200 / imgInfo.width, 200 / imgInfo.height)
           const drawWidth = imgInfo.width * scale
@@ -77,7 +91,7 @@ Page({
           ctx.drawImage(img, 0, 0, drawWidth, drawHeight)
           const imageData = ctx.getImageData(0, 0, drawWidth, drawHeight)
 
-          // 提取色卡（5个颜色）
+          // 使用 color-engine 提取色卡
           const extractedColors = colorEngine.extractColors(imageData, 5)
 
           wx.hideLoading()
@@ -109,55 +123,6 @@ Page({
     })
   },
 
-  startAccelerometer() {
-    wx.onAccelerometerChange((res) => {
-      if (!this.data.shakeListening) return
-      const { x, y, z } = res
-      if (Math.abs(x) > 15 || Math.abs(y) > 15 || Math.abs(z) > 15) {
-        this.onShake()
-      }
-    })
-    this.setData({ shakeListening: true })
-  },
-
-  stopAccelerometer() {
-    wx.stopAccelerometer()
-    this.setData({ shakeListening: false })
-  },
-
-  // 摇一摇 - 关联配色生成器
-  onShake() {
-    this.setData({ shakeListening: false })
-    wx.vibrateShort()
-    wx.showToast({ title: '随机配色生成中...', icon: 'loading' })
-
-    // 生成随机本色（莫兰迪色调）
-    const r = Math.floor(Math.random() * 80 + 150)
-    const g = Math.floor(Math.random() * 80 + 150)
-    const b = Math.floor(Math.random() * 80 + 150)
-    const baseColor = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase()
-
-    this.setData({
-      baseColor: baseColor,
-      mode: 'morandi',
-      photoColorCard: []  // 清除拍照色卡
-    })
-    this.generateColors()
-
-    setTimeout(() => this.setData({ shakeListening: true }), 500)
-  },
-
-  onManualShake() { this.onShake() },
-
-  onGoCanvas() { wx.navigateTo({ url: '/pages/canvas/canvas' }) },
-
-  onCopyColor(e) {
-    wx.setClipboardData({
-      data: e.currentTarget.dataset.color,
-      success: () => wx.showToast({ title: '已复制', icon: 'success' })
-    })
-  },
-
   // 清除拍照色卡
   onClearPhotoCard() {
     this.setData({ photoColorCard: [] })
@@ -182,7 +147,6 @@ Page({
     const colorNames = this.data.photoColorCard.map(c => c.name).join('、')
 
     try {
-      // 1. 保存色卡到 palettes 集合
       const res = await api.savePalette({
         name: '拍照取色 - ' + colorNames,
         colors: colors,
@@ -190,7 +154,7 @@ Page({
       })
 
       if (res.code === 0) {
-        // 2. 自动添加到用户收藏
+        // 自动添加到用户收藏
         const db = wx.cloud.database()
         const userRes = await db.collection('users').doc(userInfo._id).get()
         const favorites = userRes.data.favorites || []
@@ -209,5 +173,76 @@ Page({
       wx.hideLoading()
       wx.showToast({ title: '保存失败', icon: 'none' })
     }
+  },
+
+  // ==========================
+  // 摇一摇（灵敏度已优化）
+  // ==========================
+  startAccelerometer() {
+    wx.startAccelerometer({ interval: 'game' })
+    wx.onAccelerometerChange((res) => {
+      if (!this.data.shakeListening) return
+      const { x, y, z } = res
+      // 阈值调低，更容易摇出来
+      if (Math.abs(x) > 1.1 || Math.abs(y) > 1.1) {
+        this.onShake()
+      }
+    })
+    this.setData({ shakeListening: true })
+  },
+
+  stopAccelerometer() {
+    wx.stopAccelerometer()
+    this.setData({ shakeListening: false })
+  },
+
+  onShake() {
+    this.setData({ shakeListening: false })
+    wx.vibrateShort()
+    wx.showToast({ title: '随机配色生成中...', icon: 'loading' })
+
+    // 莫兰迪柔和色系
+    const morandi = [
+      '#E8B4B8', '#F18F43', '#94B276', '#9B8EA8',
+      '#C9B8E8', '#B8D4C8', '#D4C4A8', '#F5C5A3'
+    ]
+
+    const colors = []
+    for (let i = 0; i < 5; i++) {
+      const idx = Math.floor(Math.random() * morandi.length)
+      colors.push(morandi[idx])
+    }
+
+    this.setData({
+      baseColor: colors[0],
+      generatedColors: colors,
+      mode: 'morandi',
+      photoColorCard: []
+    })
+
+    setTimeout(() => {
+      this.setData({ shakeListening: true })
+    }, 800)
+  },
+
+  onManualShake() {
+    this.onShake()
+  },
+
+  // ==========================
+  // 跳转 + 复制
+  // ==========================
+  onGoCanvas() {
+    wx.navigateTo({ url: '/pages/canvas/canvas' })
+  },
+
+  onCopyColor(e) {
+    const color = e.currentTarget.dataset.color || e.currentTarget.dataset.hex
+    wx.setClipboardData({
+      data: color,
+      success: () => {
+        wx.showToast({ title: `已复制 ${color}`, icon: 'success' })
+      }
+    })
   }
 })
