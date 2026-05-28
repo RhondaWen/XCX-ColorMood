@@ -87,21 +87,21 @@
 
   <!-- 菜单 -->
   <view class="mine-menu">
-    <view class="menu-item">
+    <view class="menu-item" bindtap="onGoProfile">
       <view class="menu-left">
         <view class="menu-icon">👤</view>
         <view class="menu-text">个人信息</view>
       </view>
       <view class="menu-arrow">›</view>
     </view>
-    <view class="menu-item">
+    <view class="menu-item" bindtap="onViewAllFavorites">
       <view class="menu-left">
         <view class="menu-icon">📅</view>
         <view class="menu-text">情绪色历</view>
       </view>
       <view class="menu-arrow">›</view>
     </view>
-    <view class="menu-item">
+    <view class="menu-item" bindtap="onAbout">
       <view class="menu-left">
         <view class="menu-icon">ℹ️</view>
         <view class="menu-text">关于情绪色谱</view>

@@ -10,6 +10,7 @@
     "pages/canvas/canvas",
     "pages/gallery/gallery",
     "pages/mine/mine",
+    "pages/profile/profile",
     "pages/checkin-detail/checkin-detail"
   ],
   "window": {

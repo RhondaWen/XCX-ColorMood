@@ -1,0 +1,38 @@
+<!--pages/profile/profile.wxml-->
+<view class="profile-page">
+  <!-- 头像区域 -->
+  <view class="avatar-section">
+    <view class="avatar-wrap" bindtap="onChooseAvatar">
+      <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill" wx:if="{{userInfo.avatar && userInfo.avatar !== '🌸'}}"></image>
+      <view class="avatar-emoji" wx:else>{{userInfo.avatar || '🌸'}}</view>
+      <view class="avatar-badge">编辑</view>
+    </view>
+    <view class="avatar-tip">点击更换头像</view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <view class="form-card">
+      <view class="form-item">
+        <view class="form-label">昵称</view>
+        <input class="form-input" placeholder="请输入昵称" value="{{userInfo.username}}" bindinput="onInputName" />
+      </view>
+      <view class="form-item">
+        <view class="form-label">个性签名</view>
+        <input class="form-input" placeholder="写一句话介绍自己" value="{{userInfo.signature}}" bindinput="onInputSignature" />
+      </view>
+    </view>
+
+    <!-- 提示 -->
+    <view class="form-tip">
+      昵称和签名会展示在"我的"页面
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-section">
+    <button class="save-btn {{loading ? 'disabled' : ''}}" bindtap="onSave" disabled="{{loading}}">
+      保存修改
+    </button>
+  </view>
+</view>

@@ -171,6 +171,18 @@ Page({
 
   onViewAllFavorites() { wx.switchTab({ url: '/pages/gallery/gallery' }) },
 
+  onGoProfile() {
+    wx.navigateTo({ url: '/pages/profile/profile' })
+  },
+
+  onAbout() {
+    wx.showModal({
+      title: '关于情绪色谱',
+      content: '情绪色谱是一款记录情绪、探索配色的小程序。\n\n版本：1.0.0',
+      showCancel: false
+    })
+  },
+
   onLogout() {
     wx.showModal({
       title: '确认退出',
