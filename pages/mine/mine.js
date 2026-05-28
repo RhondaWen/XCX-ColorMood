@@ -169,7 +169,9 @@ Page({
     wx.navigateTo({ url: `/pages/detail/detail?id=${id}` })
   },
 
-  onViewAllFavorites() { wx.switchTab({ url: '/pages/gallery/gallery' }) },
+  onViewAllFavorites() {
+    wx.switchTab({ url: '/pages/gallery/gallery' })
+  },
 
   onGoProfile() {
     wx.navigateTo({ url: '/pages/profile/profile' })
