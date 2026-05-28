@@ -270,47 +270,48 @@ Page({
     })
   },
 
-  async doDeleteCheckin() {
+  doDeleteCheckin() {
     wx.showLoading({ title: '删除中...', mask: true })
 
-    const db = wx.cloud.database()
-    const userInfo = wx.getStorageSync('userInfo')
     const checkinId = this.data.checkin._id
 
-    console.log('开始删除, checkinId:', checkinId)
+    // 使用云函数删除（绕过安全规则）
+    wx.cloud.callFunction({
+      name: 'deleteCheckin',
+      data: { checkinId },
+      success: async (res) => {
+        if (res.result && res.result.success) {
+          // 更新用户打卡天数
+          const userInfo = wx.getStorageSync('userInfo')
+          if (userInfo && userInfo._id) {
+            const db = wx.cloud.database()
+            try {
+              const userRes = await db.collection('users').doc(userInfo._id).get()
+              const newDays = Math.max(0, (userRes.data.checkinDays || 1) - 1)
+              await db.collection('users').doc(userInfo._id).update({
+                data: { checkinDays: newDays }
+              })
+              userInfo.checkinDays = newDays
+              wx.setStorageSync('userInfo', userInfo)
+            } catch (e) {
+              console.log('更新打卡天数失败', e)
+            }
+          }
 
-    try {
-      // 删除打卡记录
-      const deleteRes = await db.collection('checkins').doc(checkinId).remove()
-      console.log('删除结果:', deleteRes)
-
-      // 更新用户打卡天数
-      if (userInfo && userInfo._id) {
-        const userRes = await db.collection('users').doc(userInfo._id).get()
-        const newDays = Math.max(0, (userRes.data.checkinDays || 1) - 1)
-        await db.collection('users').doc(userInfo._id).update({
-          data: { checkinDays: newDays }
-        })
-        userInfo.checkinDays = newDays
-        wx.setStorageSync('userInfo', userInfo)
+          wx.hideLoading()
+          wx.showToast({ title: '已删除', icon: 'success' })
+          setTimeout(() => wx.navigateBack(), 1500)
+        } else {
+          wx.hideLoading()
+          wx.showToast({ title: res.result?.message || '删除失败', icon: 'none' })
+        }
+      },
+      fail: (err) => {
+        console.error('云函数调用失败:', err)
+        wx.hideLoading()
+        wx.showToast({ title: '删除失败，请先上传云函数', icon: 'none', duration: 3000 })
       }
-
-      wx.hideLoading()
-      wx.showToast({ title: '已删除', icon: 'success' })
-      setTimeout(() => wx.navigateBack(), 1500)
-    } catch (err) {
-      console.error('删除失败详情:', err)
-      wx.hideLoading()
-
-      // 根据错误类型显示不同提示
-      let errorMsg = '删除失败'
-      if (err.errMsg && err.errMsg.includes('permission')) {
-        errorMsg = '权限不足，无法删除'
-      } else if (err.errMsg) {
-        errorMsg = err.errMsg
-      }
-      wx.showToast({ title: errorMsg, icon: 'none', duration: 3000 })
-    }
+    })
   },
 
   formatDate(dateStr) {
