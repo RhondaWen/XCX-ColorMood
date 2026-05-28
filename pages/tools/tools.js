@@ -129,7 +129,7 @@ Page({
   },
 
   // 保存色卡到云端并添加到收藏
-  async onSavePhotoCard() {
+  onSavePhotoCard() {
     const userInfo = wx.getStorageSync('userInfo')
     if (!userInfo || !userInfo._id) {
       wx.showToast({ title: '请先登录', icon: 'none' })
@@ -141,14 +141,31 @@ Page({
       return
     }
 
+    // 弹出编辑名称对话框
+    const defaultName = '我的色卡 ' + new Date().toLocaleDateString()
+    wx.showModal({
+      title: '保存色卡',
+      content: '请输入色卡名称',
+      editable: true,
+      placeholderText: defaultName,
+      success: (res) => {
+        if (res.confirm) {
+          const cardName = res.content && res.content.trim() ? res.content.trim() : defaultName
+          this.doSavePhotoCard(cardName)
+        }
+      }
+    })
+  },
+
+  async doSavePhotoCard(cardName) {
     wx.showLoading({ title: '保存中...', mask: true })
 
+    const userInfo = wx.getStorageSync('userInfo')
     const colors = this.data.photoColorCard.map(c => c.hex)
-    const colorNames = this.data.photoColorCard.map(c => c.name).join('、')
 
     try {
       const res = await api.savePalette({
-        name: '拍照取色 - ' + colorNames,
+        name: cardName,
         colors: colors,
         emotionTag: '拍照取色'
       })

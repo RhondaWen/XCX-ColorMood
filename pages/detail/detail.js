@@ -7,7 +7,8 @@ Page({
     palette: null,
     favorite: false,
     loading: true,
-    canDelete: false  // 是否可删除（拍照取色的色卡）
+    canDelete: false,  // 是否可删除（拍照取色的色卡）
+    canEdit: false     // 是否可编辑名称
   },
 
   onLoad(options) {
@@ -33,15 +34,15 @@ Page({
         const palette = res.data
         const userInfo = wx.getStorageSync('userInfo')
 
-        // 判断是否可删除：是拍照取色且是用户自己的
-        const canDelete = palette.emotionTag === '拍照取色' &&
-                          userInfo &&
-                          userInfo._id === palette.userId
+        // 判断是否可编辑/删除：是拍照取色且是用户自己的
+        const isOwner = userInfo && userInfo._id === palette.userId
+        const canEdit = palette.emotionTag === '拍照取色' && isOwner
 
         this.setData({
           palette: palette,
           loading: false,
-          canDelete: canDelete
+          canDelete: canEdit,
+          canEdit: canEdit
         })
         return
       }
@@ -81,6 +82,42 @@ Page({
       wx.showToast({ title: this.data.favorite ? '已收藏' : '已取消', icon: 'success' })
     } else {
       wx.showToast({ title: res.message || '操作失败', icon: 'none' })
+    }
+  },
+
+  // 编辑名称
+  onEditName() {
+    wx.showModal({
+      title: '编辑色卡名称',
+      content: '请输入新的名称',
+      editable: true,
+      placeholderText: this.data.palette.name,
+      success: (res) => {
+        if (res.confirm && res.content && res.content.trim()) {
+          this.doUpdateName(res.content.trim())
+        }
+      }
+    })
+  },
+
+  async doUpdateName(newName) {
+    wx.showLoading({ title: '保存中...', mask: true })
+
+    const db = wx.cloud.database()
+    try {
+      await db.collection('palettes').doc(this.data.paletteId).update({
+        data: { name: newName }
+      })
+
+      // 更本地数据
+      const palette = { ...this.data.palette, name: newName }
+      this.setData({ palette })
+
+      wx.hideLoading()
+      wx.showToast({ title: '名称已更新', icon: 'success' })
+    } catch (err) {
+      wx.hideLoading()
+      wx.showToast({ title: '更新失败', icon: 'none' })
     }
   },
 
