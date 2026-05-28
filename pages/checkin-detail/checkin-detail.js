@@ -235,8 +235,10 @@ Page({
     const checkin = this.data.checkin
     const userInfo = wx.getStorageSync('userInfo')
 
-    console.log('=== 删除调试信息 ===')
-    console.log('checkin._id:', checkin?._id)
+    console.log('=== 删除打卡记录 ===')
+    console.log('checkin:', checkin)
+    console.log('userInfo:', userInfo)
+    console.log('checkin.userId:', checkin?.userId)
     console.log('userInfo._id:', userInfo?._id)
 
     if (!checkin || !checkin._id) {
@@ -260,58 +262,43 @@ Page({
     })
   },
 
-  doDeleteCheckin() {
+  async doDeleteCheckin() {
     wx.showLoading({ title: '删除中...', mask: true })
 
+    const db = wx.cloud.database()
     const checkinId = this.data.checkin._id
+    const userInfo = wx.getStorageSync('userInfo')
 
-    // 使用云函数删除（管理员权限，可删除任何记录）
-    wx.cloud.callFunction({
-      name: 'deleteCheckin',
-      data: { checkinId },
-      success: async (res) => {
-        wx.hideLoading()
+    try {
+      // 直接用客户端 API 删除
+      const result = await db.collection('checkins').doc(checkinId).remove()
+      console.log('删除结果:', result)
 
-        if (res.result && res.result.success) {
-          // 更新用户打卡天数
-          const userInfo = wx.getStorageSync('userInfo')
-          if (userInfo && userInfo._id) {
-            const db = wx.cloud.database()
-            try {
-              const userRes = await db.collection('users').doc(userInfo._id).get()
-              const newDays = Math.max(0, (userRes.data.checkinDays || 1) - 1)
-              await db.collection('users').doc(userInfo._id).update({
-                data: { checkinDays: newDays }
-              })
-              userInfo.checkinDays = newDays
-              wx.setStorageSync('userInfo', userInfo)
-            } catch (e) {
-              console.log('更新打卡天数失败', e)
-            }
-          }
-
-          wx.showToast({ title: '已删除', icon: 'success' })
-          setTimeout(() => wx.navigateBack(), 1500)
-        } else {
-          wx.showToast({ title: res.result?.message || '删除失败', icon: 'none' })
-        }
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        console.error('云函数调用失败:', err)
-
-        // 如果云函数不存在，提示用户上传
-        if (err.errMsg && err.errMsg.includes('not found')) {
-          wx.showModal({
-            title: '需要上传云函数',
-            content: '请在开发者工具中右键 cloudfunctions/deleteCheckin，选择「上传并部署」',
-            showCancel: false
-          })
-        } else {
-          wx.showToast({ title: '删除失败', icon: 'none' })
-        }
+      // 更新用户打卡天数
+      if (userInfo && userInfo._id) {
+        const userRes = await db.collection('users').doc(userInfo._id).get()
+        const newDays = Math.max(0, (userRes.data.checkinDays || 1) - 1)
+        await db.collection('users').doc(userInfo._id).update({
+          data: { checkinDays: newDays }
+        })
+        userInfo.checkinDays = newDays
+        wx.setStorageSync('userInfo', userInfo)
       }
-    })
+
+      wx.hideLoading()
+      wx.showToast({ title: '已删除', icon: 'success' })
+      setTimeout(() => wx.navigateBack(), 1500)
+
+    } catch (err) {
+      wx.hideLoading()
+      console.error('删除失败:', err)
+
+      wx.showModal({
+        title: '删除失败',
+        content: '错误信息: ' + (err.errMsg || err.message || '未知错误') + '\n\n可能原因：\n1. userId 不匹配\n2. 数据库权限限制',
+        showCancel: false
+      })
+    }
   },
 
   formatDate(dateStr) {
