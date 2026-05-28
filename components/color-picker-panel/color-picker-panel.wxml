@@ -1,0 +1,87 @@
+<!--components/color-picker-panel/color-picker-panel.wxml-->
+<view class="color-picker-panel" wx:if="{{show}}">
+  <view class="panel-mask" bindtap="onClose" catchtouchmove="stopPropagation"></view>
+  <view class="panel-content">
+    <view class="panel-header">
+      <view class="panel-title">选择颜色</view>
+      <view class="panel-close" bindtap="onClose">×</view>
+    </view>
+
+    <!-- HEX 输入区域 -->
+    <view class="hex-input-section">
+      <view class="hex-label">输入颜色编号</view>
+      <view class="hex-input-row">
+        <input
+          class="hex-input"
+          type="text"
+          placeholder="#RRGGBB"
+          value="{{hexInputValue}}"
+          bindinput="onHexInput"
+          maxlength="7"
+        />
+        <picker mode="color" bindchange="onColorPickerChange" value="{{currentColor}}">
+          <view class="hex-picker-btn" style="background: {{currentColor}}"></view>
+        </picker>
+      </view>
+      <view class="hex-hint" wx:if="{{hexInputError}}">{{hexInputError}}</view>
+    </view>
+
+    <!-- 当前颜色预览 -->
+    <view class="current-color-preview" style="background: {{currentColor}}">
+      <view class="current-color-hex">{{currentColor}}</view>
+    </view>
+
+    <!-- 可滚动的颜色分类区域 -->
+    <scroll-view scroll-y class="palette-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="palette-section">
+        <view class="palette-label">暖色系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.warm}}" wx:key="*this">
+            <view class="palette-dot {{currentColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+
+      <view class="palette-section">
+        <view class="palette-label">冷色系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.cool}}" wx:key="*this">
+            <view class="palette-dot {{currentColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+
+      <view class="palette-section">
+        <view class="palette-label">柔和系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.soft}}" wx:key="*this">
+            <view class="palette-dot {{currentColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+
+      <view class="palette-section">
+        <view class="palette-label">中性色</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.neutral}}" wx:key="*this">
+            <view class="palette-dot {{currentColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+
+      <view class="palette-section">
+        <view class="palette-label">鲜艳色</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.vibrant}}" wx:key="*this">
+            <view class="palette-dot {{currentColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 确认按钮 -->
+    <view class="panel-footer">
+      <button class="btn-confirm" style="background: {{currentColor}}" bindtap="onConfirm">确定</button>
+    </view>
+  </view>
+</view>

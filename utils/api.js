@@ -62,8 +62,9 @@ const getUserInfo = async () => {
 
   const db = getDb()
   try {
-    const res = await db.collection('users').doc(userInfo._id).get()
-    return { code: 0, data: res.data }
+    const res = await db.collection('users').where({ _id: userInfo._id }).get()
+    if (res.data.length === 0) return { code: -1, message: '用户不存在' }
+    return { code: 0, data: res.data[0] }
   } catch (err) {
     return { code: -1, message: '获取失败' }
   }
@@ -94,10 +95,9 @@ const getPaletteGallery = async (params) => {
   try {
     let query = db.collection('palettes')
 
-    // 只获取系统预设色卡（userId 为 system 或不存在，且不是拍照取色）
+    // 获取系统预设色卡（userId 为 'system'）
     query = query.where({
-      userId: db.command.in(['system', null, undefined]).or(db.command.exists(false)),
-      emotionTag: db.command.neq('拍照取色')
+      userId: 'system'
     })
 
     // 如果有情绪标签筛选
@@ -108,16 +108,20 @@ const getPaletteGallery = async (params) => {
     const res = await query.orderBy('likeCount', 'desc').limit(20).get()
     return { code: 0, data: res.data }
   } catch (err) {
-    return { code: -1, message: '获取失败' }
+    console.error('getPaletteGallery 失败:', err)
+    return { code: -1, message: '获取失败', data: [] }
   }
 }
 
-// 获取色板详情
+// 获取色板详情（用 id 字段查询）
 const getPaletteDetail = async (id) => {
   const db = getDb()
   try {
-    const res = await db.collection('palettes').doc(id).get()
-    return { code: 0, data: res.data }
+    const res = await db.collection('palettes').where({ id: id }).get()
+    if (res.data.length > 0) {
+      return { code: 0, data: res.data[0] }
+    }
+    return { code: -1, message: '色卡不存在' }
   } catch (err) {
     return { code: -1, message: '获取失败' }
   }
@@ -125,37 +129,54 @@ const getPaletteDetail = async (id) => {
 
 // 收藏色板
 const favoritePalette = async (paletteId) => {
+  console.log('favoritePalette 调用，paletteId:', paletteId)
   const userInfo = wx.getStorageSync('userInfo')
   if (!userInfo || !userInfo._id) return { code: -1, message: '未登录' }
 
   const db = getDb()
   try {
-    // 获取用户当前收藏
-    const userRes = await db.collection('users').doc(userInfo._id).get()
-    const favorites = userRes.data.favorites || []
+    // 用 where 查询用户（参考色卡查询方式）
+    const userRes = await db.collection('users').where({ _id: userInfo._id }).get()
+    if (userRes.data.length === 0) {
+      console.error('用户不存在，_id:', userInfo._id)
+      return { code: -1, message: '用户数据异常，请重新登录' }
+    }
+    const userData = userRes.data[0]
+    const favorites = userData.favorites || []
+    console.log('数据库中的 favorites:', favorites)
 
     // 判断是否已收藏
     const idx = favorites.indexOf(paletteId)
+    console.log('查找结果 idx:', idx)
     if (idx > -1) {
       favorites.splice(idx, 1) // 取消收藏
     } else {
       favorites.push(paletteId) // 添加收藏
     }
+    console.log('更新后的 favorites:', favorites)
 
-    // 更新用户收藏
-    await db.collection('users').doc(userInfo._id).update({
+    // 更新用户收藏（用 doc 更新）
+    await db.collection('users').doc(userData._id).update({
       data: { favorites }
     })
 
-    // 更新色板点赞数
-    const paletteRes = await db.collection('palettes').doc(paletteId).get()
-    const likeCount = paletteRes.data.likeCount || 0
-    await db.collection('palettes').doc(paletteId).update({
-      data: { likeCount: idx > -1 ? likeCount - 1 : likeCount + 1 }
-    })
+    // 更新本地缓存的 userInfo
+    userInfo.favorites = favorites
+    wx.setStorageSync('userInfo', userInfo)
 
-    return { code: 0, data: { favorites } }
+    // 更新色板点赞数（用 id 字段查询）
+    const paletteRes = await db.collection('palettes').where({ id: paletteId }).get()
+    if (paletteRes.data.length > 0) {
+      const paletteDoc = paletteRes.data[0]
+      const likeCount = paletteDoc.likeCount || 0
+      await db.collection('palettes').doc(paletteDoc._id).update({
+        data: { likeCount: idx > -1 ? likeCount - 1 : likeCount + 1 }
+      })
+    }
+
+    return { code: 0, data: { favorites, isFavorite: idx === -1 } }
   } catch (err) {
+    console.error('收藏失败:', err)
     return { code: -1, message: '操作失败' }
   }
 }
@@ -167,8 +188,12 @@ const savePalette = async (data) => {
 
   const db = getDb()
   try {
+    // 生成自定义 ID（用时间戳）
+    const customId = 'photo_' + Date.now()
+
     const res = await db.collection('palettes').add({
       data: {
+        id: customId,
         name: data.name,
         colors: data.colors,
         emotionTag: data.emotionTag || '自定义',
@@ -177,8 +202,9 @@ const savePalette = async (data) => {
         createTime: db.serverDate()
       }
     })
-    return { code: 0, data: { _id: res._id } }
+    return { code: 0, data: { _id: res._id, id: customId } }
   } catch (err) {
+    console.error('保存色板失败:', err)
     return { code: -1, message: '保存失败' }
   }
 }
@@ -222,11 +248,14 @@ const checkin = async (data) => {
       }
     })
 
-    // 更新用户打卡天数
-    const userRes = await db.collection('users').doc(userInfo._id).get()
-    await db.collection('users').doc(userInfo._id).update({
-      data: { checkinDays: (userRes.data.checkinDays || 0) + 1 }
-    })
+    // 更新用户打卡天数（用 where 查询）
+    const userRes = await db.collection('users').where({ _id: userInfo._id }).get()
+    if (userRes.data.length > 0) {
+      const userData = userRes.data[0]
+      await db.collection('users').doc(userData._id).update({
+        data: { checkinDays: (userData.checkinDays || 0) + 1 }
+      })
+    }
 
     return { code: 0, message: '打卡成功' }
   } catch (err) {
@@ -258,24 +287,34 @@ const getCheckinHistory = async (params) => {
 // 获取用户收藏列表
 const getFavorites = async () => {
   const userInfo = wx.getStorageSync('userInfo')
+  console.log('getFavorites userInfo:', userInfo)
   if (!userInfo || !userInfo._id) return { code: -1, message: '未登录' }
 
   const db = getDb()
   try {
-    const userRes = await db.collection('users').doc(userInfo._id).get()
-    const favorites = userRes.data.favorites || []
+    // 用 where 查询用户
+    const userRes = await db.collection('users').where({ _id: userInfo._id }).get()
+    if (userRes.data.length === 0) {
+      console.log('用户不存在')
+      return { code: -1, message: '用户数据异常' }
+    }
+    const favorites = userRes.data[0].favorites || []
+    console.log('数据库中的 favorites:', favorites)
 
     if (favorites.length === 0) {
       return { code: 0, data: [] }
     }
 
-    // 批量获取收藏的色板
+    // 批量获取收藏的色板（用 id 字段匹配）
+    console.log('查询 palettes 表，条件 id in:', favorites)
     const paletteRes = await db.collection('palettes')
-      .where({ _id: db.command.in(favorites) })
+      .where({ id: db.command.in(favorites) })
       .get()
+    console.log('查询结果:', paletteRes.data)
 
     return { code: 0, data: paletteRes.data }
   } catch (err) {
+    console.error('获取收藏失败:', err)
     return { code: -1, message: '获取失败' }
   }
 }

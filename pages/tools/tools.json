@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "配色工具",
-  "usingComponents": {}
+  "usingComponents": {
+    "color-picker-panel": "/components/color-picker-panel/color-picker-panel"
+  }
 }

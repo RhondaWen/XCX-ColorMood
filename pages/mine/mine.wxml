@@ -14,8 +14,8 @@
         <view class="stat-label">打卡天数</view>
       </view>
       <view class="stat-item">
-        <view class="stat-num" style="color: #94B276">{{favoritesCount}}</view>
-        <view class="stat-label">已收藏</view>
+        <view class="stat-num" style="color: #94B276">{{photoCount}}</view>
+        <view class="stat-label">我的色卡</view>
       </view>
     </view>
   </view>
@@ -49,44 +49,6 @@
         >{{item.day}}</view>
       </block>
     </view>
-    <view class="calendar-legend">
-      <view class="legend-item">
-        <view class="legend-dot" style="background: #E8B4B8"></view>
-        <view class="legend-text">温柔</view>
-      </view>
-      <view class="legend-item">
-        <view class="legend-dot" style="background: #F18F43"></view>
-        <view class="legend-text">活力</view>
-      </view>
-      <view class="legend-item">
-        <view class="legend-dot" style="background: #94B276"></view>
-        <view class="legend-text">沉静</view>
-      </view>
-      <view class="legend-item">
-        <view class="legend-dot" style="background: #9B8EA8"></view>
-        <view class="legend-text">忧郁</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 我的收藏 -->
-  <view class="favorites-section">
-    <view class="favorites-header">
-      <view class="favorites-title">我的收藏</view>
-      <view class="favorites-more" bindtap="onViewAllFavorites">查看全部 →</view>
-    </view>
-    <scroll-view scroll-x class="favorites-scroll">
-      <block wx:for="{{favorites}}" wx:key="id">
-        <view class="fav-card" data-id="{{item.id}}" bindtap="onFavoriteDetail">
-          <view class="fav-strip">
-            <block wx:for="{{item.colors}}" wx:for-item="color" wx:key="*this">
-              <view class="fav-strip-item" style="background: {{color}}"></view>
-            </block>
-          </view>
-          <view class="fav-name">{{item.name}}</view>
-        </view>
-      </block>
-    </scroll-view>
   </view>
 
   <!-- 菜单 -->

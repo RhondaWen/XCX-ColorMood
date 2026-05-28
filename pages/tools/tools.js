@@ -14,16 +14,62 @@ Page({
     ],
     generatedColors: [],
     shakeListening: false,
-    photoColorCard: []  // 拍照提取的色卡
+    photoColorCard: [],  // 拍照提取的色卡
+    showColorPicker: false,  // 颜色选择面板
+    quickColors: ['#F18F43', '#94B276', '#D5DD5E', '#C9B8E8', '#E8B4B8', '#9B8EA8', '#F0CECE', '#B8D4C8', '#2C2C2C']
   },
 
   onLoad() {
     this.generateColors()
+  },
+
+  onShow() {
+    // 进入工具页时启动摇一摇
     this.startAccelerometer()
+  },
+
+  onHide() {
+    // 离开工具页时停止摇一摇
+    this.stopAccelerometer()
   },
 
   onUnload() {
     this.stopAccelerometer()
+  },
+
+  // ==========================
+  // 颜色选择面板
+  // ==========================
+  onShowColorPicker() {
+    this.setData({ showColorPicker: true })
+  },
+
+  onColorPickerChange(e) {
+    const color = e.detail.color
+    this.setData({ baseColor: color })
+    this.generateColors()
+  },
+
+  onColorPickerConfirm(e) {
+    const color = e.detail.color
+    // 添加到快捷颜色列表
+    const quickColors = this.data.quickColors.slice()
+    if (!quickColors.includes(color)) {
+      if (quickColors.length >= 12) {
+        quickColors.shift()
+      }
+      quickColors.push(color)
+    }
+    this.setData({
+      baseColor: color,
+      quickColors,
+      showColorPicker: false
+    })
+    this.generateColors()
+  },
+
+  onColorPickerClose(e) {
+    this.setData({ showColorPicker: false })
   },
 
   // ==========================
@@ -36,9 +82,9 @@ Page({
   },
 
   onHexInput(e) {
-    const hex = e.detail.value
+    const hex = e.detail.value.toUpperCase()
+    this.setData({ baseColor: hex })
     if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-      this.setData({ baseColor: hex })
       this.generateColors()
     }
   },
@@ -171,14 +217,18 @@ Page({
       })
 
       if (res.code === 0) {
-        // 自动添加到用户收藏
+        // 用 id 字段添加到用户收藏
         const db = wx.cloud.database()
         const userRes = await db.collection('users').doc(userInfo._id).get()
         const favorites = userRes.data.favorites || []
-        favorites.push(res.data._id)
+        favorites.push(res.data.id)  // 使用自定义的 id
         await db.collection('users').doc(userInfo._id).update({
           data: { favorites }
         })
+
+        // 更新本地缓存
+        userInfo.favorites = favorites
+        wx.setStorageSync('userInfo', userInfo)
 
         wx.hideLoading()
         wx.showToast({ title: '已保存到收藏', icon: 'success' })
@@ -188,6 +238,7 @@ Page({
       }
     } catch (err) {
       wx.hideLoading()
+      console.error('保存色卡失败:', err)
       wx.showToast({ title: '保存失败', icon: 'none' })
     }
   },

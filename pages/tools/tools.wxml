@@ -18,12 +18,10 @@
   <view class="generator-card">
     <view class="gen-title">🪄 配色生成器</view>
     <view class="color-input-row">
-      <view class="color-swatch" style="background: {{baseColor}}">
-        <picker mode="color" bindchange="onColorChange" value="{{baseColor}}">
-          <view class="picker-inner"></view>
-        </picker>
+      <view class="color-swatch" style="background: {{baseColor}}" bindtap="onShowColorPicker">
+        <view class="picker-inner"></view>
       </view>
-      <input class="hex-input" type="text" value="{{baseColor}}" bindinput="onHexInput" placeholder="#RRGGBB" />
+      <input class="hex-input" type="text" value="{{baseColor}}" bindinput="onHexInput" placeholder="#RRGGBB" maxlength="7" />
     </view>
 
     <view class="mode-btns">
@@ -91,4 +89,14 @@
       <view class="tool-desc">在画布上自由预览颜色搭配</view>
     </view>
   </view>
+
+  <!-- 颜色选择面板 -->
+  <color-picker-panel
+    show="{{showColorPicker}}"
+    currentColor="{{baseColor}}"
+    quickColors="{{quickColors}}"
+    bindcolorchange="onColorPickerChange"
+    bindconfirm="onColorPickerConfirm"
+    bindclose="onColorPickerClose"
+  />
 </view>

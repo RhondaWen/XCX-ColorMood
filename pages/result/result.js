@@ -1,5 +1,6 @@
 // pages/result/result.js - 云开发版本
 const api = require('../../utils/api')
+const palettesData = require('../../utils/palettes-data')
 
 Page({
   data: {
@@ -15,6 +16,8 @@ Page({
     currentCustomColor: '#F18F43',
     quickColors: ['#F18F43', '#94B276', '#D5DD5E', '#C9B8E8', '#E8B4B8', '#9B8EA8', '#F0CECE', '#B8D4C8', '#2C2C2C'],
     showColorPicker: false,
+    hexInputValue: '#F18F43',
+    hexInputError: '',
     colorPalette: {
       warm: ['#FF6B6B', '#FF8E72', '#FFA07A', '#FFB347', '#FFCC5C', '#F18F43', '#E8B4B8', '#F0CECE'],
       cool: ['#4ECDC4', '#45B7D1', '#96CEB4', '#94B276', '#88D8B0', '#7FDBDA', '#B8D4C8', '#A8D8EA'],
@@ -23,11 +26,11 @@ Page({
       vibrant: ['#FF4757', '#2F86A6', '#FFDD59', '#7BED9F', '#70A1FF', '#5352ED', '#D63384', '#E056FD']
     },
     emotions: [
-      { id: 1, name: '温柔', icon: '🌸', color: '#E8B4B8' },
-      { id: 2, name: '活力', icon: '🌟', color: '#F18F43' },
-      { id: 3, name: '沉静', icon: '🍃', color: '#94B276' },
-      { id: 4, name: '忧郁', icon: '🌧', color: '#9B8EA8' },
-      { id: 5, name: '自定义', icon: '✨', color: '#D5DD5E', isCustom: true }
+      { id: 1, name: '温柔', icon: '🌸', iconClass: 'shape-pink-teardrop', color: '#E8B4B8' },
+      { id: 2, name: '活力', icon: '🌟', iconClass: 'shape-cyan-triangle', color: '#F18F43' },
+      { id: 3, name: '沉静', icon: '🍃', iconClass: 'shape-orange-square', color: '#94B276' },
+      { id: 4, name: '忧郁', icon: '🌧', iconClass: 'shape-blue-penta', color: '#9B8EA8' },
+      { id: 5, name: '自定义', icon: '✨', iconClass: 'shape-custom', color: '#D5DD5E', isCustom: true }
     ],
     selectedEmotionId: null,
     customEmotionName: '',
@@ -90,10 +93,10 @@ Page({
 
   loadEmotionInfo() {
     const emotions = {
-      1: { name: '温柔', icon: '🌸', color: '#E8B4B8' },
-      2: { name: '活力', icon: '🌟', color: '#F18F43' },
-      3: { name: '沉静', icon: '🍃', color: '#94B276' },
-      4: { name: '忧郁', icon: '🌧', color: '#9B8EA8' }
+      1: { name: '温柔', icon: '🌸', iconClass: 'shape-pink-teardrop', color: '#E8B4B8' },
+      2: { name: '活力', icon: '🌟', iconClass: 'shape-cyan-triangle', color: '#F18F43' },
+      3: { name: '沉静', icon: '🍃', iconClass: 'shape-orange-square', color: '#94B276' },
+      4: { name: '忧郁', icon: '🌧', iconClass: 'shape-blue-penta', color: '#9B8EA8' }
     }
     this.setData({ emotion: emotions[this.data.emotionId] })
   },
@@ -112,22 +115,7 @@ Page({
   },
 
   getBackupPalettes() {
-    const data = {
-      1: [
-        { _id: 'p1', name: '初春晨雾', colors: ['#E8B4B8', '#F0CECE', '#C9B8E8', '#F9F0E0', '#D4C4A8'], likeCount: 128, emotionTag: '温柔', emotionColor: '#E8B4B8' },
-        { _id: 'p2', name: '温暖米麻', colors: ['#F5C5A3', '#E8D5B7', '#D4BFA0', '#C9A880', '#B89060'], likeCount: 95, emotionTag: '温柔', emotionColor: '#E8B4B8' }
-      ],
-      2: [
-        { _id: 'p3', name: '暮光晚橙', colors: ['#F18F43', '#F5A660', '#D5DD5E', '#E8D080', '#F0C860'], likeCount: 204, emotionTag: '活力', emotionColor: '#F18F43' }
-      ],
-      3: [
-        { _id: 'p4', name: '苔原初绿', colors: ['#94B276', '#A8C488', '#7A9660', '#B4D090', '#C8DCA8'], likeCount: 156, emotionTag: '沉静', emotionColor: '#94B276' }
-      ],
-      4: [
-        { _id: 'p5', name: '烟雨江南', colors: ['#9B8EA8', '#7A6880', '#B8AABF', '#6A5870', '#C8C0D0'], likeCount: 118, emotionTag: '忧郁', emotionColor: '#9B8EA8' }
-      ]
-    }
-    return data[this.data.emotionId] || data[1]
+    return palettesData.getPalettesByEmotionId(this.data.emotionId)
   },
 
   onPaletteSelect(e) {
@@ -196,7 +184,36 @@ Page({
   },
 
   onColorPickerChange(e) {
-    this.setData({ currentCustomColor: e.detail.value })
+    this.setData({
+      currentCustomColor: e.detail.value,
+      hexInputValue: e.detail.value,
+      hexInputError: ''
+    })
+  },
+
+  // HEX 输入处理
+  onHexInput(e) {
+    const value = e.detail.value.toUpperCase()
+    this.setData({ hexInputValue: value })
+
+    // 验证 HEX 格式
+    if (value.length === 7 && /^#[0-9A-F]{6}$/.test(value)) {
+      this.setData({ hexInputError: '', currentCustomColor: value })
+    } else if (value.length > 0 && !/^#[0-9A-F]*$/.test(value)) {
+      this.setData({ hexInputError: '格式错误，请输入 #RRGGBB' })
+    } else {
+      this.setData({ hexInputError: '' })
+    }
+  },
+
+  // 确认 HEX 输入
+  onHexConfirm() {
+    const value = this.data.hexInputValue
+    if (/^#[0-9A-F]{6}$/.test(value)) {
+      this.setData({ currentCustomColor: value, hexInputError: '' })
+    } else {
+      this.setData({ hexInputError: '请输入有效的颜色值 #RRGGBB' })
+    }
   },
 
   async onConfirmCheckin() {
@@ -273,16 +290,20 @@ Page({
   onGoBack() { wx.navigateBack() },
 
   onPaletteDetail(e) {
-    const { id } = e.currentTarget.dataset
-    wx.navigateTo({ url: `/pages/detail/detail?id=${id}` })
-  },
+    const id = e.currentTarget.dataset.id
+    const index = e.currentTarget.dataset.index
+    console.log('点击色卡，ID:', id, 'index:', index)
 
-  async onFavoriteAll() {
-    const userInfo = wx.getStorageSync('userInfo')
-    if (!userInfo || userInfo.isGuest) {
-      wx.showToast({ title: '请先登录', icon: 'none' })
-      return
+    let paletteId = id
+    if (!paletteId && index !== undefined && this.data.palettes[index]) {
+      paletteId = this.data.palettes[index].id || this.data.palettes[index]._id
+      console.log('从数据中获取 ID:', paletteId)
     }
-    wx.showToast({ title: '已全部收藏', icon: 'success' })
+
+    if (paletteId) {
+      wx.navigateTo({ url: `/pages/detail/detail?id=${paletteId}` })
+    } else {
+      wx.showToast({ title: '无法获取色卡信息', icon: 'none' })
+    }
   }
 })

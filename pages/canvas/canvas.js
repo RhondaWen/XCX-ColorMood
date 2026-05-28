@@ -3,7 +3,9 @@ Page({
   data: {
     currentShape: 'rect',
     currentColor: '#F18F43',
-    paletteColors: ['#F18F43', '#94B276', '#D5DD5E', '#C9B8E8', '#E8B4B8', '#9B8EA8', '#F0CECE', '#B8D4C8', '#2C2C2C', '#F9F5F0']
+    paletteColors: ['#F18F43', '#94B276', '#D5DD5E', '#C9B8E8', '#E8B4B8', '#9B8EA8', '#F0CECE', '#B8D4C8', '#2C2C2C', '#F9F5F0'],
+    quickColors: ['#F18F43', '#94B276', '#D5DD5E', '#C9B8E8', '#E8B4B8', '#9B8EA8', '#F0CECE', '#B8D4C8', '#2C2C2C'],
+    showColorPicker: false
   },
 
   onLoad() {
@@ -13,6 +15,61 @@ Page({
 
   onReady() {
     this.initCanvas()
+  },
+
+  // 显示颜色选择面板
+  onShowColorPicker() {
+    this.setData({ showColorPicker: true })
+  },
+
+  // 颜色选择变化
+  onColorPickerChange(e) {
+    const color = e.detail.color
+    this.setData({ currentColor: color })
+  },
+
+  // 确认颜色选择
+  onColorPickerConfirm(e) {
+    const color = e.detail.color
+    // 添加到画板颜色列表
+    const paletteColors = this.data.paletteColors.slice()
+    if (!paletteColors.includes(color)) {
+      if (paletteColors.length >= 12) {
+        paletteColors.shift()
+      }
+      paletteColors.push(color)
+    }
+    // 添加到快捷颜色列表
+    const quickColors = this.data.quickColors.slice()
+    if (!quickColors.includes(color)) {
+      if (quickColors.length >= 12) {
+        quickColors.shift()
+      }
+      quickColors.push(color)
+    }
+    this.setData({
+      currentColor: color,
+      paletteColors,
+      quickColors,
+      showColorPicker: false
+    })
+  },
+
+  // 关闭颜色选择面板
+  onColorPickerClose(e) {
+    const color = e.detail.color
+    // 添加到画板颜色列表
+    const paletteColors = this.data.paletteColors.slice()
+    if (!paletteColors.includes(color)) {
+      if (paletteColors.length >= 12) {
+        paletteColors.shift()
+      }
+      paletteColors.push(color)
+    }
+    this.setData({
+      paletteColors,
+      showColorPicker: false
+    })
   },
 
   initCanvas() {

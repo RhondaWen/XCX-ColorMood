@@ -268,11 +268,19 @@ Page({
     const db = wx.cloud.database()
     const checkinId = this.data.checkin._id
     const userInfo = wx.getStorageSync('userInfo')
+    const checkinDate = this.data.checkin.date
+    const today = new Date().toISOString().slice(0, 10)
 
     try {
       // 直接用客户端 API 删除
       const result = await db.collection('checkins').doc(checkinId).remove()
       console.log('删除结果:', result)
+
+      // 如果删除的是今天的打卡，清除本地缓存
+      if (checkinDate === today) {
+        wx.removeStorageSync('todayCheckin')
+        wx.removeStorageSync('todayColor')
+      }
 
       // 更新用户打卡天数
       if (userInfo && userInfo._id) {

@@ -5,10 +5,10 @@
     <view class="section-sub">每一种颜色都是一种情绪</view>
   </view>
 
-  <!-- 主标签：广场 / 我的收藏 -->
+  <!-- 主标签：广场 / 我的色库 -->
   <view class="main-tab-bar">
     <view class="main-tab {{currentMainTab === 'gallery' ? 'active' : ''}}" data-tab="gallery" bindtap="onMainTabChange">广场</view>
-    <view class="main-tab {{currentMainTab === 'favorites' ? 'active' : ''}}" data-tab="favorites" bindtap="onMainTabChange">我的收藏</view>
+    <view class="main-tab {{currentMainTab === 'favorites' ? 'active' : ''}}" data-tab="favorites" bindtap="onMainTabChange">我的色库</view>
   </view>
 
   <!-- 广场：情绪标签筛选 -->
@@ -22,7 +22,7 @@
     </block>
   </view>
 
-  <!-- 我的收藏：来源标签筛选 -->
+  <!-- 我的色库：来源标签筛选（只保留全部和拍照取色） -->
   <view class="sub-tab-bar" wx:if="{{currentMainTab === 'favorites'}}">
     <block wx:for="{{sourceTabs}}" wx:key="*this">
       <view
@@ -35,8 +35,8 @@
 
   <scroll-view scroll-y class="gallery-scroll" bindscrolltolower="onReachBottom">
     <view class="palette-list" wx:if="{{palettes.length > 0}}">
-      <block wx:for="{{palettes}}" wx:key="_id">
-        <view class="palette-card" data-id="{{item._id}}" bindtap="onPaletteDetail">
+      <block wx:for="{{palettes}}" wx:key="id">
+        <view class="palette-card" data-id="{{item.id}}" data-index="{{index}}" bindtap="onPaletteDetail">
           <view class="color-strip">
             <block wx:for="{{item.colors}}" wx:for-item="color" wx:key="*this">
               <view class="strip-item" style="background: {{color}}"></view>
@@ -47,11 +47,8 @@
               <view class="palette-name">{{item.name}}</view>
               <view class="meta-bottom">
                 <view class="tag" style="background: {{item.emotionColor || '#F18F43'}}22; color: {{item.emotionColor || '#F18F43'}}">{{item.emotionTag}}</view>
-                <view class="like-count" wx:if="{{currentMainTab === 'gallery'}}">♡ {{item.likeCount || 0}}</view>
               </view>
             </view>
-            <view class="fav-btn" wx:if="{{currentMainTab === 'gallery'}}" data-id="{{item._id}}" bindtap="onFavorite">🤍</view>
-            <view class="fav-btn" wx:if="{{currentMainTab === 'favorites'}}" data-id="{{item._id}}" bindtap="onDeleteFavorite">🗑️</view>
           </view>
         </view>
       </block>

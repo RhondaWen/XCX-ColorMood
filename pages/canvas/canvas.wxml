@@ -19,6 +19,7 @@
           bindtap="onColorSelect"
         ></view>
       </block>
+      <view class="color-add-btn" bindtap="onShowColorPicker">+</view>
     </view>
   </view>
 
@@ -37,4 +38,14 @@
       <view class="action-btn" bindtap="onClear">🗑</view>
     </view>
   </view>
+
+  <!-- 颜色选择面板 -->
+  <color-picker-panel
+    show="{{showColorPicker}}"
+    currentColor="{{currentColor}}"
+    quickColors="{{quickColors}}"
+    bindcolorchange="onColorPickerChange"
+    bindconfirm="onColorPickerConfirm"
+    bindclose="onColorPickerClose"
+  />
 </view>

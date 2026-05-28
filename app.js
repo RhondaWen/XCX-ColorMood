@@ -13,6 +13,13 @@ App({
       traceUser: true
     })
 
+    // 清理错误的 userInfo 缓存（如果存储的是字符串而非对象）
+    const userInfo = wx.getStorageSync('userInfo')
+    if (userInfo && (typeof userInfo !== 'object' || !userInfo.avatar)) {
+      console.log('清理无效的 userInfo 缓存')
+      wx.removeStorageSync('userInfo')
+    }
+
     this.checkLoginStatus()
   },
 

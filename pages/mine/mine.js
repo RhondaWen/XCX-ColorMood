@@ -6,12 +6,11 @@ Page({
     userInfo: null,
     isGuest: false,
     checkinDays: 0,
-    favoritesCount: 0,
+    photoCount: 0,
     currentMonth: '',
     currentYear: 0,
     currentMonthNum: 0,
     calendarData: [],
-    favorites: [],
     emotionColors: { '温柔': '#E8B4B8', '活力': '#F18F43', '沉静': '#94B276', '忧郁': '#9B8EA8' }
   },
 
@@ -20,20 +19,63 @@ Page({
     this.calendarMonth = new Date().getMonth() + 1
     this.initUserInfo()
     this.initCalendar()
-    this.loadFavorites()
   },
   onShow() { this.initUserInfo() },
 
   initUserInfo() {
-    const userInfo = wx.getStorageSync('userInfo')
-    if (userInfo) {
+    let userInfo = wx.getStorageSync('userInfo')
+    // 确保 userInfo 是正确格式的对象
+    if (userInfo && typeof userInfo === 'object' && userInfo.avatar) {
       this.setData({
         userInfo,
-        isGuest: userInfo.isGuest || false,
-        checkinDays: userInfo.checkinDays || 0,
-        favoritesCount: (userInfo.favorites || []).length
+        isGuest: userInfo.isGuest || false
       })
+      // 从云端获取最新的统计数据
+      this.loadUserStats()
       this.loadCheckinHistory()
+    } else {
+      // 清除错误数据，设置为默认游客
+      wx.removeStorageSync('userInfo')
+      this.setData({
+        userInfo: { username: '游客', avatar: '🎨' },
+        isGuest: true,
+        checkinDays: 0,
+        photoCount: 0
+      })
+    }
+  },
+
+  // 从云端获取用户统计数据
+  async loadUserStats() {
+    const userInfo = wx.getStorageSync('userInfo')
+    if (!userInfo || !userInfo._id) return
+
+    const db = wx.cloud.database()
+    try {
+      // 获取用户打卡天数
+      const userRes = await db.collection('users').where({ _id: userInfo._id }).get()
+      if (userRes.data.length > 0) {
+        const userData = userRes.data[0]
+        this.setData({
+          checkinDays: userData.checkinDays || 0
+        })
+        userInfo.checkinDays = userData.checkinDays || 0
+        wx.setStorageSync('userInfo', userInfo)
+      }
+
+      // 获取用户创建的拍照取色色卡数量
+      const paletteRes = await db.collection('palettes')
+        .where({ userId: userInfo._id, emotionTag: '拍照取色' })
+        .count()
+      this.setData({
+        photoCount: paletteRes.total || 0
+      })
+    } catch (err) {
+      console.log('获取用户统计失败:', err)
+      this.setData({
+        checkinDays: userInfo.checkinDays || 0,
+        photoCount: 0
+      })
     }
   },
 
@@ -151,35 +193,17 @@ Page({
     }
   },
 
-  async loadFavorites() {
-    if (this.data.isGuest) return
-    const res = await api.getFavorites()
-    if (res.code === 0) {
-      const favorites = res.data.slice(0, 4).map(p => ({
-        _id: p._id,
-        name: p.name,
-        colors: p.colors.slice(0, 3)
-      }))
-      this.setData({ favorites, favoritesCount: res.data.length })
-    }
-  },
-
-  onFavoriteDetail(e) {
-    const { id } = e.currentTarget.dataset
-    wx.navigateTo({ url: `/pages/detail/detail?id=${id}` })
-  },
-
-  onViewAllFavorites() { wx.switchTab({ url: '/pages/gallery/gallery' }) },
-
   onGoProfile() {
     wx.navigateTo({ url: '/pages/profile/profile' })
   },
 
   onAbout() {
     wx.showModal({
-      title: '关于情绪色谱',
-      content: '情绪色谱是一款记录情绪、探索配色的小程序。\n\n版本：1.0.0',
-      showCancel: false
+      title: '用颜色，说心情',
+      content: '情绪色谱，陪你走过每一种感受。\n\n温柔的粉，藏着心底的软；\n活力的橙，装着对生活的热望；\n沉静的绿，给你喘息的空间；\n忧郁的紫，也允许你暂时低落。\n\n感谢遇见，愿你被世界温柔以待。',
+      showCancel: false,
+      confirmText: '知道啦',
+      confirmColor: '#F18F43'
     })
   },
 

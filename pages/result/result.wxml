@@ -14,7 +14,11 @@
           data-id="{{item.id}}"
           bindtap="onEmotionSelect"
         >
-          <view class="emotion-select-icon">{{item.icon}}</view>
+          <view class="emotion-select-shape {{item.iconClass}}">
+            <view class="eye"></view>
+            <view class="eye"></view>
+            <view class="mouth"></view>
+          </view>
           <view class="emotion-select-name">{{item.name}}</view>
         </view>
       </block>
@@ -26,7 +30,11 @@
     <view class="nav-back" bindtap="onGoBack">←</view>
     <view class="header-info">
       <view class="emotion-icon-wrap">
-        <text class="emotion-icon">{{emotion.icon}}</text>
+        <view class="emotion-shape {{emotion.iconClass}}">
+          <view class="eye"></view>
+          <view class="eye"></view>
+          <view class="mouth"></view>
+        </view>
       </view>
       <view>
         <view class="emotion-name">{{emotion.name}}</view>
@@ -53,9 +61,10 @@
   <!-- 色板列表 -->
   <scroll-view scroll-y class="palette-scroll" wx:if="{{emotion && !loading && palettes.length > 0 && !emotion.isCustom}}">
     <view class="palette-list">
-      <block wx:for="{{palettes}}" wx:key="_id">
+      <block wx:for="{{palettes}}" wx:key="id">
         <view
-          class="palette-card {{selectedPalette._id === item._id ? 'selected' : ''}}"
+          class="palette-card {{selectedPalette.id === item.id ? 'selected' : ''}}"
+          data-id="{{item.id}}"
           data-index="{{index}}"
           bindtap="{{isCheckinMode ? 'onPaletteSelect' : 'onPaletteDetail'}}"
         >
@@ -71,13 +80,11 @@
               <view class="palette-name">{{item.name}}</view>
               <view class="meta-bottom">
                 <view class="tag" style="background: {{emotion.color}}22; color: {{emotion.color}}">{{item.emotionTag}}</view>
-                <view class="like-count">♡ {{item.likeCount}}</view>
               </view>
             </view>
-            <view class="fav-btn {{selectedPalette._id === item._id ? 'checked' : ''}}" wx:if="{{isCheckinMode}}">
-              {{selectedPalette._id === item._id ? '✓' : '○'}}
+            <view class="fav-btn {{selectedPalette.id === item.id ? 'checked' : ''}}" wx:if="{{isCheckinMode}}">
+              {{selectedPalette.id === item.id ? '✓' : '○'}}
             </view>
-            <view class="fav-btn" wx:else>🤍</view>
           </view>
         </view>
       </block>
@@ -130,6 +137,24 @@
         <view class="panel-title">选择颜色</view>
         <view class="panel-close" bindtap="onHideColorPicker">×</view>
       </view>
+
+      <!-- HEX 输入区域 -->
+      <view class="hex-input-section">
+        <view class="hex-label">输入颜色编号</view>
+        <view class="hex-input-row">
+          <input
+            class="hex-input"
+            type="text"
+            placeholder="#RRGGBB"
+            value="{{hexInputValue}}"
+            bindinput="onHexInput"
+            maxlength="7"
+          />
+          <view class="hex-preview" style="background: {{currentCustomColor}}"></view>
+        </view>
+        <view class="hex-hint" wx:if="{{hexInputError}}">{{hexInputError}}</view>
+      </view>
+
       <view class="current-color-preview" style="background: {{currentCustomColor}}">
         <view class="current-color-hex">{{currentCustomColor}}</view>
       </view>
@@ -182,11 +207,6 @@
   <!-- 加载状态 -->
   <view class="loading-wrap" wx:if="{{loading}}">
     <view class="loading-text">加载中...</view>
-  </view>
-
-  <!-- 底部操作栏 -->
-  <view class="bottom-bar" wx:if="{{emotion && !isCheckinMode}}">
-    <button class="btn-secondary" bindtap="onFavoriteAll">收藏全部推荐</button>
   </view>
 
   <!-- 打卡确认按钮 -->

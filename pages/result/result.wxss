@@ -35,8 +35,8 @@
 }
 
 .emotion-icon-wrap {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   background: rgba(255,255,255,0.5);
   border-radius: 50%;
   display: flex;
@@ -533,3 +533,195 @@
 .btn-confirm::after {
   border: none;
 }
+
+/* ====================== 情绪图案样式 ====================== */
+.emotion-shape,
+.emotion-select-shape {
+  width: 60rpx;
+  height: 40rpx;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emotion-shape .eye,
+.emotion-select-shape .eye {
+  width: 16rpx;
+  height: 16rpx;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 20%;
+}
+
+.emotion-shape .eye::after,
+.emotion-select-shape .eye::after {
+  content: "";
+  width: 10rpx;
+  height: 10rpx;
+  background: #000;
+  border-radius: 50%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.emotion-shape .mouth,
+.emotion-select-shape .mouth {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  font-size: 18rpx;
+  color: #000;
+  font-weight: bold;
+  transform: translateX(-50%);
+}
+
+/* 1. 温柔 · 粉色碗形 */
+.shape-pink-teardrop {
+  width: 60rpx;
+  height: 40rpx;
+  background: #f962e7;
+  border-radius: 50% 50% 50% 50% / 25% 25% 75% 75%;
+}
+.shape-pink-teardrop .eye:nth-child(1) { left: 14rpx; }
+.shape-pink-teardrop .eye:nth-child(2) { right: 14rpx; }
+.shape-pink-teardrop .mouth::after { content: "ε"; }
+
+/* 2. 活力 · 黄色三角形 */
+.shape-cyan-triangle {
+  width: 60rpx;
+  height: 50rpx;
+  background: #FFE066;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.shape-cyan-triangle .eye {
+  top: 22rpx;
+}
+.shape-cyan-triangle .eye:nth-child(1) { left: 14rpx; }
+.shape-cyan-triangle .eye:nth-child(2) { right: 14rpx; }
+.shape-cyan-triangle .mouth {
+  top: 30rpx;
+}
+.shape-cyan-triangle .mouth::after { content: "ᴥ"; }
+
+/* 3. 沉静 · 绿色方形 */
+.shape-orange-square {
+  width: 60rpx !important;
+  height: 50rpx !important;
+  background: #AED9AF;
+  border-radius: 12rpx;
+}
+.shape-orange-square .eye {
+  width: 18rpx;
+  height: 18rpx;
+}
+.shape-orange-square .eye:nth-child(1) { left: 10rpx; top: 10rpx; }
+.shape-orange-square .eye:nth-child(2) { right: 10rpx; top: 10rpx; }
+.shape-orange-square .mouth {
+  top: 26rpx;
+}
+.shape-orange-square .mouth::after { content: "_"; font-weight: 900; }
+
+/* 4. 忧郁 · 蓝色五边形 */
+.shape-blue-penta {
+  width: 56rpx;
+  height: 56rpx;
+  background: #3a80e1;
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+.shape-blue-penta .eye {
+  top: 38% !important;
+}
+.shape-blue-penta .eye:nth-child(1) { left: 10rpx; }
+.shape-blue-penta .eye:nth-child(2) { right: 10rpx; }
+.shape-blue-penta .mouth {
+  top: 55%;
+}
+.shape-blue-penta .mouth::after { content: "^"; }
+
+/* 5. 自定义 · 星形 */
+.shape-custom {
+  width: 56rpx;
+  height: 56rpx;
+  background: #D5DD5E;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+.shape-custom .eye {
+  width: 14rpx;
+  height: 14rpx;
+  top: 40%;
+}
+.shape-custom .eye:nth-child(1) { left: 16rpx; }
+.shape-custom .eye:nth-child(2) { right: 16rpx; }
+.shape-custom .mouth {
+  top: 58%;
+}
+.shape-custom .mouth::after { content: "✦"; font-size: 14rpx; }
+
+/* 情绪选择区域的图案放大 */
+.emotion-select-shape {
+  width: 100rpx;
+  height: 80rpx;
+}
+
+.emotion-select-shape .eye {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.emotion-select-shape .eye::after {
+  width: 16rpx;
+  height: 16rpx;
+}
+
+.emotion-select-shape .mouth {
+  font-size: 28rpx;
+}
+
+.emotion-select-shape.shape-pink-teardrop {
+  width: 100rpx;
+  height: 70rpx;
+}
+.emotion-select-shape.shape-pink-teardrop .eye:nth-child(1) { left: 22rpx; }
+.emotion-select-shape.shape-pink-teardrop .eye:nth-child(2) { right: 22rpx; }
+
+.emotion-select-shape.shape-cyan-triangle {
+  width: 100rpx;
+  height: 85rpx;
+}
+.emotion-select-shape.shape-cyan-triangle .eye { top: 38rpx; }
+.emotion-select-shape.shape-cyan-triangle .eye:nth-child(1) { left: 24rpx; }
+.emotion-select-shape.shape-cyan-triangle .eye:nth-child(2) { right: 24rpx; }
+.emotion-select-shape.shape-cyan-triangle .mouth { top: 50rpx; }
+
+.emotion-select-shape.shape-orange-square {
+  width: 100rpx !important;
+  height: 85rpx !important;
+}
+.emotion-select-shape.shape-orange-square .eye {
+  width: 28rpx;
+  height: 28rpx;
+}
+.emotion-select-shape.shape-orange-square .eye:nth-child(1) { left: 18rpx; top: 18rpx; }
+.emotion-select-shape.shape-orange-square .eye:nth-child(2) { right: 18rpx; top: 18rpx; }
+.emotion-select-shape.shape-orange-square .mouth { top: 45rpx; }
+
+.emotion-select-shape.shape-blue-penta {
+  width: 95rpx;
+  height: 95rpx;
+}
+.emotion-select-shape.shape-blue-penta .eye { top: 42% !important; }
+.emotion-select-shape.shape-blue-penta .eye:nth-child(1) { left: 18rpx; }
+.emotion-select-shape.shape-blue-penta .eye:nth-child(2) { right: 18rpx; }
+.emotion-select-shape.shape-blue-penta .mouth { top: 58%; }
+
+.emotion-select-shape.shape-custom {
+  width: 95rpx;
+  height: 95rpx;
+}
+.emotion-select-shape.shape-custom .eye { top: 42%; }
+.emotion-select-shape.shape-custom .eye:nth-child(1) { left: 28rpx; }
+.emotion-select-shape.shape-custom .eye:nth-child(2) { right: 28rpx; }
+.emotion-select-shape.shape-custom .mouth { top: 60%; }
