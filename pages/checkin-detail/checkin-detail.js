@@ -232,8 +232,30 @@ Page({
   },
 
   onDeleteCheckin() {
-    if (!this.data.checkin || !this.data.checkin._id) {
+    const checkin = this.data.checkin
+    const userInfo = wx.getStorageSync('userInfo')
+
+    console.log('=== 删除调试信息 ===')
+    console.log('checkin:', checkin)
+    console.log('checkin._id:', checkin?._id)
+    console.log('checkin.userId:', checkin?.userId)
+    console.log('userInfo:', userInfo)
+    console.log('userInfo._id:', userInfo?._id)
+
+    if (!checkin || !checkin._id) {
       wx.showToast({ title: '记录不存在', icon: 'none' })
+      return
+    }
+
+    if (!userInfo || !userInfo._id) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      return
+    }
+
+    // 检查是否是自己的打卡记录
+    if (checkin.userId !== userInfo._id) {
+      console.log('userId 不匹配:', checkin.userId, 'vs', userInfo._id)
+      wx.showToast({ title: '只能删除自己的打卡记录', icon: 'none' })
       return
     }
 
@@ -253,10 +275,14 @@ Page({
 
     const db = wx.cloud.database()
     const userInfo = wx.getStorageSync('userInfo')
+    const checkinId = this.data.checkin._id
+
+    console.log('开始删除, checkinId:', checkinId)
 
     try {
       // 删除打卡记录
-      await db.collection('checkins').doc(this.data.checkin._id).remove()
+      const deleteRes = await db.collection('checkins').doc(checkinId).remove()
+      console.log('删除结果:', deleteRes)
 
       // 更新用户打卡天数
       if (userInfo && userInfo._id) {
@@ -273,9 +299,17 @@ Page({
       wx.showToast({ title: '已删除', icon: 'success' })
       setTimeout(() => wx.navigateBack(), 1500)
     } catch (err) {
-      console.error('删除失败', err)
+      console.error('删除失败详情:', err)
       wx.hideLoading()
-      wx.showToast({ title: '删除失败: ' + (err.message || '未知错误'), icon: 'none' })
+
+      // 根据错误类型显示不同提示
+      let errorMsg = '删除失败'
+      if (err.errMsg && err.errMsg.includes('permission')) {
+        errorMsg = '权限不足，无法删除'
+      } else if (err.errMsg) {
+        errorMsg = err.errMsg
+      }
+      wx.showToast({ title: errorMsg, icon: 'none', duration: 3000 })
     }
   },
 

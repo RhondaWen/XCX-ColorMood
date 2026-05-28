@@ -169,63 +169,134 @@
 .tool-name { font-size: 15px; font-weight: 700; color: #2C2C2C; }
 .tool-desc { font-size: 11px; color: #6B6B6B; line-height: 1.5; }
 
-/* ========== 新增：图片取色模块样式 ========== */
-.extract-card {
+/* 拍照取色色卡区域 */
+.photo-color-section {
+  margin: 0 16px 12px;
   background: #fff;
-  border-radius: 20rpx;
-  padding: 30rpx;
-  margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.05);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-.extract-title {
-  font-size: 28rpx;
-  font-weight: bold;
-  margin-bottom: 24rpx;
-  color: #333;
-}
-.color-select-row {
+
+.photo-header {
   display: flex;
-  gap: 16rpx;
-  flex-wrap: wrap;
-  margin-bottom: 24rpx;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
-.select-color-item {
-  width: 110rpx;
-  height: 110rpx;
-  border-radius: 16rpx;
+
+.photo-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2C2C2C;
+}
+
+.photo-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #6B6B6B;
+  background: #F0EBE3;
+  border-radius: 50%;
+}
+
+.photo-desc {
+  font-size: 12px;
+  color: #6B6B6B;
+  margin-bottom: 12px;
+}
+
+.color-strip-card {
+  background: #F9F5F0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.color-strip {
+  height: 60px;
+  display: flex;
+}
+
+.strip-item {
+  flex: 1;
+}
+
+.strip-item:active {
+  opacity: 0.85;
+}
+
+.strip-meta {
+  padding: 12px;
+}
+
+.color-list {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.color-info-item {
+  display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 8rpx;
-  position: relative;
-  border: 3rpx solid transparent;
+  gap: 10px;
 }
-/* 选中状态边框 */
-.select-color-item.active {
-  border-color: #F18F43;
+
+.color-info-item:active {
+  opacity: 0.7;
 }
+
+.color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.color-text {
+  flex: 1;
+}
+
 .color-hex {
-  font-size: 18rpx;
-  color: #fff;
-  text-shadow: 0 1rpx 2rpx rgba(0,0,0,0.3);
+  font-size: 13px;
+  font-weight: 600;
+  color: #2C2C2C;
 }
-.check-icon {
-  position: absolute;
-  top: 8rpx;
-  right: 8rpx;
-  font-size: 24rpx;
-  color: #fff;
-  text-shadow: 0 1rpx 2rpx rgba(0,0,0,0.3);
+
+.color-name {
+  font-size: 11px;
+  color: #6B6B6B;
 }
-.save-btn {
-  width: 100%;
-  height: 70rpx;
-  line-height: 70rpx;
-  text-align: center;
-  background: #F18F43;
-  color: #fff;
-  border-radius: 35rpx;
-  font-size: 26rpx;
+
+.color-ratio {
+  font-size: 12px;
+  color: #F18F43;
+  font-weight: 500;
 }
-/* ========================================== */
+
+/* 保存色卡按钮 */
+.save-card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, #F18F43 0%, #F5B971 100%);
+  border-radius: 12px;
+}
+
+.save-card-btn:active {
+  opacity: 0.85;
+}
+
+.save-icon {
+  font-size: 18px;
+}
+
+.save-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
