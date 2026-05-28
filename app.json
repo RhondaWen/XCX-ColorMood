@@ -9,7 +9,8 @@
     "pages/tools/tools",
     "pages/canvas/canvas",
     "pages/gallery/gallery",
-    "pages/mine/mine"
+    "pages/mine/mine",
+    "pages/checkin-detail/checkin-detail"
   ],
   "window": {
     "backgroundTextStyle": "dark",

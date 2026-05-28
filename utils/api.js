@@ -205,7 +205,10 @@ const checkin = async (data) => {
         date: today,
         emotionTag: data.emotionTag,
         emotionId: data.emotionId,
+        emotionColor: data.emotionColor || null,
+        emotionIcon: data.emotionIcon || null,
         colorHex: data.colorHex,
+        colors: data.colors || [data.colorHex],
         paletteId: data.paletteId || null,
         createTime: db.serverDate()
       }

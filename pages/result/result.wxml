@@ -1,7 +1,28 @@
 <!--pages/result/result.wxml-->
 <view class="result-page">
+  <!-- 打卡模式：情绪选择 -->
+  <view class="checkin-emotion-section" wx:if="{{isCheckinMode && !emotion}}">
+    <view class="checkin-header">
+      <view class="checkin-title">选择今日情绪</view>
+      <view class="checkin-sub">记录你的情绪色彩</view>
+    </view>
+    <view class="emotion-select-grid">
+      <block wx:for="{{emotions}}" wx:key="id">
+        <view
+          class="emotion-select-card"
+          style="--card-color: {{item.color}}; background: {{item.color}}22;"
+          data-id="{{item.id}}"
+          bindtap="onEmotionSelect"
+        >
+          <view class="emotion-select-icon">{{item.icon}}</view>
+          <view class="emotion-select-name">{{item.name}}</view>
+        </view>
+      </block>
+    </view>
+  </view>
+
   <!-- Header -->
-  <view class="result-header" style="background: linear-gradient(160deg, {{emotion.color}}33, transparent)">
+  <view class="result-header" wx:if="{{emotion}}" style="background: linear-gradient(160deg, {{emotion.color}}33, transparent)">
     <view class="nav-back" bindtap="onGoBack">←</view>
     <view class="header-info">
       <view class="emotion-icon-wrap">
@@ -9,19 +30,34 @@
       </view>
       <view>
         <view class="emotion-name">{{emotion.name}}</view>
-        <view class="emotion-sub">为你推荐 {{palettes.length}} 套配色方案</view>
+        <view class="emotion-sub">{{isCheckinMode ? '选择配色完成打卡' : '为你推荐 ' + palettes.length + ' 套配色方案'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 自定义情绪输入 -->
+  <view class="custom-emotion-section" wx:if="{{isCheckinMode && emotion && emotion.isCustom && !loading}}">
+    <view class="custom-input-row">
+      <input
+        class="custom-name-input"
+        placeholder="输入自定义情绪名称"
+        value="{{customEmotionName}}"
+        bindinput="onCustomEmotionInput"
+      />
+      <view class="custom-color-picker" bindtap="onShowColorPicker">
+        <view class="color-preview" style="background: {{customEmotionColor}}"></view>
       </view>
     </view>
   </view>
 
   <!-- 色板列表 -->
-  <scroll-view scroll-y class="palette-scroll">
+  <scroll-view scroll-y class="palette-scroll" wx:if="{{emotion && !loading && palettes.length > 0 && !emotion.isCustom}}">
     <view class="palette-list">
-      <block wx:for="{{palettes}}" wx:key="id">
+      <block wx:for="{{palettes}}" wx:key="_id">
         <view
-          class="palette-card"
-          data-id="{{item.id}}"
-          bindtap="onPaletteDetail"
+          class="palette-card {{selectedPalette._id === item._id ? 'selected' : ''}}"
+          data-index="{{index}}"
+          bindtap="{{isCheckinMode ? 'onPaletteSelect' : 'onPaletteDetail'}}"
         >
           <!-- 色条 -->
           <view class="color-strip">
@@ -38,15 +74,125 @@
                 <view class="like-count">♡ {{item.likeCount}}</view>
               </view>
             </view>
-            <view class="fav-btn">🤍</view>
+            <view class="fav-btn {{selectedPalette._id === item._id ? 'checked' : ''}}" wx:if="{{isCheckinMode}}">
+              {{selectedPalette._id === item._id ? '✓' : '○'}}
+            </view>
+            <view class="fav-btn" wx:else>🤍</view>
           </view>
         </view>
       </block>
     </view>
+
+    <!-- 自定义配色入口 -->
+    <view class="custom-colors-entry" wx:if="{{isCheckinMode}}" bindtap="onUseCustomColors">
+      <view class="entry-icon">🎨</view>
+      <view class="entry-text">或者，自定义配色方案</view>
+      <view class="entry-arrow">→</view>
+    </view>
   </scroll-view>
 
+  <!-- 自定义配色区域 -->
+  <view class="custom-colors-section" wx:if="{{isCheckinMode && (useCustomColors || emotion.isCustom) && !loading}}">
+    <view class="section-title">自定义配色</view>
+
+    <!-- 已添加的颜色 -->
+    <view class="custom-color-strip">
+      <block wx:for="{{customColors}}" wx:key="*this">
+        <view class="custom-color-item" style="background: {{item}}">
+          <view class="remove-color" data-index="{{index}}" bindtap="onRemoveCustomColor">×</view>
+        </view>
+      </block>
+      <view class="add-color-btn" bindtap="onAddCustomColor" wx:if="{{customColors.length < 10}}">+</view>
+    </view>
+
+    <!-- 快捷选色 -->
+    <view class="quick-colors-row">
+      <view class="quick-label">快捷选色</view>
+      <view class="quick-color-grid">
+        <block wx:for="{{quickColors}}" wx:key="*this">
+          <view
+            class="quick-dot {{currentCustomColor === item ? 'active' : ''}}"
+            style="background: {{item}}"
+            data-color="{{item}}"
+            bindtap="onQuickColorSelect"
+          ></view>
+        </block>
+        <view class="quick-picker" bindtap="onShowColorPicker">+</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 自定义颜色选择面板 -->
+  <view class="color-picker-panel" wx:if="{{showColorPicker}}">
+    <view class="panel-mask" bindtap="onHideColorPicker"></view>
+    <view class="panel-content">
+      <view class="panel-header">
+        <view class="panel-title">选择颜色</view>
+        <view class="panel-close" bindtap="onHideColorPicker">×</view>
+      </view>
+      <view class="current-color-preview" style="background: {{currentCustomColor}}">
+        <view class="current-color-hex">{{currentCustomColor}}</view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">暖色系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.warm}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">冷色系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.cool}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">柔和系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.soft}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">中性色</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.neutral}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">鲜艳色</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.vibrant}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="panel-footer">
+        <button class="btn-confirm" style="background: {{currentCustomColor}}" bindtap="onHideColorPicker">确定</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-text">加载中...</view>
+  </view>
+
   <!-- 底部操作栏 -->
-  <view class="bottom-bar">
+  <view class="bottom-bar" wx:if="{{emotion && !isCheckinMode}}">
     <button class="btn-secondary" bindtap="onFavoriteAll">收藏全部推荐</button>
+  </view>
+
+  <!-- 打卡确认按钮 -->
+  <view class="bottom-bar checkin-bar" wx:if="{{isCheckinMode && emotion && (selectedPalette || useCustomColors || emotion.isCustom) && customColors.length > 0}}">
+    <button class="btn-primary" style="background: {{emotion.color}}" bindtap="onConfirmCheckin">
+      确认打卡
+    </button>
   </view>
 </view>

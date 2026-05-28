@@ -8,12 +8,20 @@ Page({
     checkinDays: 0,
     favoritesCount: 0,
     currentMonth: '',
+    currentYear: 0,
+    currentMonthNum: 0,
     calendarData: [],
     favorites: [],
     emotionColors: { '温柔': '#E8B4B8', '活力': '#F18F43', '沉静': '#94B276', '忧郁': '#9B8EA8' }
   },
 
-  onLoad() { this.initUserInfo(); this.initCalendar(); this.loadFavorites() },
+  onLoad() {
+    this.calendarYear = new Date().getFullYear()
+    this.calendarMonth = new Date().getMonth() + 1
+    this.initUserInfo()
+    this.initCalendar()
+    this.loadFavorites()
+  },
   onShow() { this.initUserInfo() },
 
   initUserInfo() {
@@ -33,28 +41,49 @@ Page({
     if (this.data.isGuest) return
     const res = await api.getCheckinHistory()
     if (res.code === 0) {
+      this.allCheckins = res.data
       this.buildCalendar(res.data)
     }
   },
 
   initCalendar() {
     const now = new Date()
-    this.setData({ currentMonth: `${now.getFullYear()}年 ${now.getMonth() + 1}月` })
+    this.calendarYear = now.getFullYear()
+    this.calendarMonth = now.getMonth() + 1
+    this.updateMonthDisplay()
     this.buildCalendar([])
   },
 
+  updateMonthDisplay() {
+    this.setData({
+      currentMonth: `${this.calendarYear}年 ${this.calendarMonth}月`,
+      currentYear: this.calendarYear,
+      currentMonthNum: this.calendarMonth
+    })
+  },
+
   buildCalendar(checkins) {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth() + 1
+    const year = this.calendarYear
+    const month = this.calendarMonth
     const firstDay = new Date(year, month - 1, 1).getDay()
     const daysInMonth = new Date(year, month, 0).getDate()
-    const today = now.getDate()
+    const now = new Date()
+    const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth() + 1)
+    const today = isCurrentMonth ? now.getDate() : -1
+
+    // 存储每天打卡的ID
+    this.checkinIdMap = {}
 
     const checkinMap = {}
     checkins.forEach(c => {
-      const d = parseInt(c.date.slice(8))
-      checkinMap[d] = this.data.emotionColors[c.emotionTag] || '#E8B4B8'
+      const dateStr = c.date
+      const cYear = parseInt(dateStr.slice(0, 4))
+      const cMonth = parseInt(dateStr.slice(5, 7))
+      const cDay = parseInt(dateStr.slice(8, 10))
+      if (cYear === year && cMonth === month) {
+        checkinMap[cDay] = c.colorHex || this.data.emotionColors[c.emotionTag] || '#E8B4B8'
+        this.checkinIdMap[cDay] = c._id
+      }
     })
 
     const calendar = []
@@ -70,6 +99,58 @@ Page({
     this.setData({ calendarData: calendar })
   },
 
+  onPrevMonth() {
+    this.calendarMonth--
+    if (this.calendarMonth < 1) {
+      this.calendarMonth = 12
+      this.calendarYear--
+    }
+    this.updateMonthDisplay()
+    if (this.allCheckins) {
+      this.buildCalendar(this.allCheckins)
+    } else {
+      this.loadCheckinHistory()
+    }
+  },
+
+  onNextMonth() {
+    this.calendarMonth++
+    if (this.calendarMonth > 12) {
+      this.calendarMonth = 1
+      this.calendarYear++
+    }
+    this.updateMonthDisplay()
+    if (this.allCheckins) {
+      this.buildCalendar(this.allCheckins)
+    } else {
+      this.loadCheckinHistory()
+    }
+  },
+
+  onCalendarDay(e) {
+    const { day, checked } = e.currentTarget.dataset
+
+    if (checked && this.checkinIdMap[day]) {
+      // 已打卡，跳转到详情页
+      wx.navigateTo({
+        url: `/pages/checkin-detail/checkin-detail?id=${this.checkinIdMap[day]}`
+      })
+    } else if (!checked && day === new Date().getDate() &&
+               this.calendarYear === new Date().getFullYear() &&
+               this.calendarMonth === new Date().getMonth() + 1) {
+      // 今天未打卡，提示去打卡
+      wx.showModal({
+        title: '今日未打卡',
+        content: '是否现在去打卡？',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({ url: '/pages/result/result?mode=checkin' })
+          }
+        }
+      })
+    }
+  },
+
   async loadFavorites() {
     if (this.data.isGuest) return
     const res = await api.getFavorites()
@@ -82,9 +163,6 @@ Page({
       this.setData({ favorites, favoritesCount: res.data.length })
     }
   },
-
-  onPrevMonth() { wx.showToast({ title: '上月数据', icon: 'none' }) },
-  onNextMonth() { wx.showToast({ title: '下月数据', icon: 'none' }) },
 
   onFavoriteDetail(e) {
     const { id } = e.currentTarget.dataset

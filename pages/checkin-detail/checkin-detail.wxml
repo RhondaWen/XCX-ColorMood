@@ -1,0 +1,167 @@
+<!--pages/checkin-detail/checkin-detail.wxml-->
+<view class="detail-page">
+  <!-- Header -->
+  <view class="detail-header" style="background: linear-gradient(160deg, {{checkin.colorHex || '#E8B4B8'}}33, transparent)">
+    <view class="nav-back" bindtap="onGoBack">←</view>
+    <view class="header-content">
+      <view class="date-display">{{checkin.date ? formatDate(checkin.date) : ''}}</view>
+      <view class="emotion-display" wx:if="{{!isEditMode && selectedEmotion}}">
+        <text class="emotion-icon">{{selectedEmotion.icon}}</text>
+        <text class="emotion-name">{{selectedEmotion.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 详情展示 -->
+  <view class="detail-content" wx:if="{{!loading && checkin && !isEditMode}}">
+    <!-- 配色展示 -->
+    <view class="color-section">
+      <view class="section-title">今日配色</view>
+      <view class="color-strip-large">
+        <block wx:for="{{paletteColors}}" wx:key="*this">
+          <view class="strip-large-item" style="background: {{item}}">
+            <view class="color-hex">{{item}}</view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <view class="action-btn edit-btn" bindtap="onEnterEdit">编辑</view>
+      <view class="action-btn delete-btn" bindtap="onDeleteCheckin">删除</view>
+    </view>
+  </view>
+
+  <!-- 编辑模式 -->
+  <view class="edit-content" wx:if="{{!loading && isEditMode}}">
+    <!-- 情绪选择 -->
+    <view class="edit-section">
+      <view class="section-title">选择情绪</view>
+      <view class="emotion-grid">
+        <block wx:for="{{emotions}}" wx:key="id">
+          <view
+            class="emotion-card {{selectedEmotion.id === item.id ? 'selected' : ''}}"
+            style="--card-color: {{item.color}}"
+            data-id="{{item.id}}"
+            bindtap="onEmotionSelect"
+          >
+            <text class="emotion-icon">{{item.icon}}</text>
+            <text class="emotion-label">{{item.name}}</text>
+          </view>
+        </block>
+      </view>
+
+      <!-- 自定义情绪输入 -->
+      <view class="custom-emotion-input" wx:if="{{selectedEmotion.isCustom}}">
+        <input
+          class="custom-input"
+          placeholder="输入自定义情绪名称"
+          value="{{customEmotionName}}"
+          bindinput="onCustomEmotionInput"
+        />
+        <view class="color-picker-row">
+          <view class="picker-label">情绪颜色</view>
+          <view class="color-preview" style="background: {{customEmotionColor}}" bindtap="onShowColorPicker"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 配色编辑 -->
+    <view class="edit-section">
+      <view class="section-title">编辑配色</view>
+      <view class="color-edit-strip">
+        <block wx:for="{{paletteColors}}" wx:key="*this">
+          <view class="color-edit-item" style="background: {{item}}">
+            <view class="remove-btn" data-index="{{index}}" bindtap="onRemoveColor">×</view>
+          </view>
+        </block>
+        <view class="add-color-btn" bindtap="onAddCustomColor" wx:if="{{paletteColors.length < 10}}">+</view>
+      </view>
+
+      <!-- 快捷颜色选择 -->
+      <view class="quick-colors">
+        <view class="quick-color-label">快捷选色</view>
+        <view class="quick-color-grid">
+          <block wx:for="{{quickColors}}" wx:key="*this">
+            <view
+              class="quick-color-dot {{currentCustomColor === item ? 'active' : ''}}"
+              style="background: {{item}}"
+              data-color="{{item}}"
+              bindtap="onQuickColorSelect"
+            ></view>
+          </block>
+          <view class="quick-color-picker" bindtap="onShowColorPicker">+</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 编辑操作按钮 -->
+    <view class="edit-buttons">
+      <view class="edit-btn cancel-btn" bindtap="onCancelEdit">取消</view>
+      <view class="edit-btn save-btn" style="background: {{selectedEmotion.color || '#F18F43'}}" bindtap="onSaveEdit">保存</view>
+    </view>
+  </view>
+
+  <!-- 自定义颜色选择面板 -->
+  <view class="color-picker-panel" wx:if="{{showColorPicker}}">
+    <view class="panel-mask" bindtap="onHideColorPicker"></view>
+    <view class="panel-content">
+      <view class="panel-header">
+        <view class="panel-title">选择颜色</view>
+        <view class="panel-close" bindtap="onHideColorPicker">×</view>
+      </view>
+      <view class="current-color-preview" style="background: {{currentCustomColor}}">
+        <view class="current-color-hex">{{currentCustomColor}}</view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">暖色系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.warm}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">冷色系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.cool}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">柔和系</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.soft}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">中性色</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.neutral}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="palette-section">
+        <view class="palette-label">鲜艳色</view>
+        <view class="palette-row">
+          <block wx:for="{{colorPalette.vibrant}}" wx:key="*this">
+            <view class="palette-dot {{currentCustomColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="onPaletteColorSelect"></view>
+          </block>
+        </view>
+      </view>
+      <view class="panel-footer">
+        <button class="btn-confirm" style="background: {{currentCustomColor}}" bindtap="onHideColorPicker">确定</button>
+      </view>
+    </view>
+  </view>
+</view>
