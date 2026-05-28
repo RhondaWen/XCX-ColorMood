@@ -2,8 +2,8 @@
 <view class="detail-page">
   <!-- 色带 -->
   <view class="color-band">
-    <block wx:for="{{palette.colors}}" wx:key="hex">
-      <view class="band-item" style="background: {{item.hex}}"></view>
+    <block wx:for="{{palette.colors}}" wx:key="*this">
+      <view class="band-item" style="background: {{item}}"></view>
     </block>
     <!-- 返回按钮 -->
     <view class="nav-back-wrap">
@@ -11,39 +11,44 @@
     </view>
     <!-- 名称 -->
     <view class="band-title">{{palette.name}}</view>
+    <!-- 标签 -->
+    <view class="band-tag" style="background: {{palette.emotionColor || '#F18F43'}}22; color: {{palette.emotionColor || '#F18F43'}}">{{palette.emotionTag}}</view>
   </view>
 
   <!-- 颜色详情 -->
   <scroll-view scroll-y class="detail-scroll">
     <view class="detail-body">
-      <block wx:for="{{palette.colors}}" wx:key="hex">
-        <view
-          class="color-row"
-          data-hex="{{item.hex}}"
-          bindtap="onCopyColor"
-        >
-          <view class="color-dot" style="background: {{item.hex}}"></view>
-          <view class="color-info">
-            <view class="color-name">{{item.name}}</view>
-            <view class="color-hex">{{item.hex}}</view>
+      <!-- 颜色列表 -->
+      <view class="color-list-section">
+        <view class="section-title">颜色详情</view>
+        <block wx:for="{{palette.colors}}" wx:key="*this">
+          <view
+            class="color-row"
+            data-color="{{item}}"
+            bindtap="onCopyColor"
+          >
+            <view class="color-dot" style="background: {{item}}"></view>
+            <view class="color-info">
+              <view class="color-hex">{{item}}</view>
+            </view>
+            <view class="copy-btn">复制</view>
           </view>
-          <view class="tag" style="background: {{palette.emotionColor}}22; color: {{palette.emotionColor}}">{{item.tag}}</view>
-          <view class="copy-btn">复制</view>
-        </view>
-      </block>
+        </block>
+      </view>
 
       <!-- 描述 -->
-      <view class="detail-desc">
+      <view class="detail-desc" wx:if="{{palette.description}}">
         {{palette.description}}
       </view>
     </view>
 
     <!-- 操作按钮 -->
     <view class="detail-actions">
-      <button class="btn-primary" bindtap="onFavorite">
+      <button class="btn-primary" bindtap="onFavorite" wx:if="{{!canDelete}}">
         {{favorite ? '❤️' : '♡'}} 收藏
       </button>
       <button class="btn-ghost" bindtap="onSaveImage">保存图片</button>
+      <button class="btn-danger" bindtap="onDelete" wx:if="{{canDelete}}">删除色卡</button>
     </view>
   </scroll-view>
 </view>

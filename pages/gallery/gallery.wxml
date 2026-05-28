@@ -5,20 +5,38 @@
     <view class="section-sub">每一种颜色都是一种情绪</view>
   </view>
 
-  <view class="tab-bar">
-    <block wx:for="{{tabs}}" wx:key="*this">
+  <!-- 主标签：广场 / 我的收藏 -->
+  <view class="main-tab-bar">
+    <view class="main-tab {{currentMainTab === 'gallery' ? 'active' : ''}}" data-tab="gallery" bindtap="onMainTabChange">广场</view>
+    <view class="main-tab {{currentMainTab === 'favorites' ? 'active' : ''}}" data-tab="favorites" bindtap="onMainTabChange">我的收藏</view>
+  </view>
+
+  <!-- 广场：情绪标签筛选 -->
+  <view class="sub-tab-bar" wx:if="{{currentMainTab === 'gallery'}}">
+    <block wx:for="{{emotionTabs}}" wx:key="*this">
       <view
-        class="tab-item {{currentTab === item ? 'active' : ''}}"
+        class="sub-tab {{currentEmotionTab === item ? 'active' : ''}}"
         data-tab="{{item}}"
-        bindtap="onTabChange"
+        bindtap="onEmotionTabChange"
+      >{{item}}</view>
+    </block>
+  </view>
+
+  <!-- 我的收藏：来源标签筛选 -->
+  <view class="sub-tab-bar" wx:if="{{currentMainTab === 'favorites'}}">
+    <block wx:for="{{sourceTabs}}" wx:key="*this">
+      <view
+        class="sub-tab {{currentSourceTab === item ? 'active' : ''}}"
+        data-tab="{{item}}"
+        bindtap="onSourceTabChange"
       >{{item}}</view>
     </block>
   </view>
 
   <scroll-view scroll-y class="gallery-scroll" bindscrolltolower="onReachBottom">
-    <view class="palette-list">
-      <block wx:for="{{palettes}}" wx:key="id">
-        <view class="palette-card" data-id="{{item.id}}" bindtap="onPaletteDetail">
+    <view class="palette-list" wx:if="{{palettes.length > 0}}">
+      <block wx:for="{{palettes}}" wx:key="_id">
+        <view class="palette-card" data-id="{{item._id}}" bindtap="onPaletteDetail">
           <view class="color-strip">
             <block wx:for="{{item.colors}}" wx:for-item="color" wx:key="*this">
               <view class="strip-item" style="background: {{color}}"></view>
@@ -28,14 +46,27 @@
             <view class="meta-left">
               <view class="palette-name">{{item.name}}</view>
               <view class="meta-bottom">
-                <view class="tag" style="background: {{item.emotionColor}}22; color: {{item.emotionColor}}">{{item.emotionTag}}</view>
-                <view class="like-count">♡ {{item.likeCount}}</view>
+                <view class="tag" style="background: {{item.emotionColor || '#F18F43'}}22; color: {{item.emotionColor || '#F18F43'}}">{{item.emotionTag}}</view>
+                <view class="like-count" wx:if="{{currentMainTab === 'gallery'}}">♡ {{item.likeCount || 0}}</view>
               </view>
             </view>
-            <view class="fav-btn" bindtap="onFavorite">🤍</view>
+            <view class="fav-btn" wx:if="{{currentMainTab === 'gallery'}}" data-id="{{item._id}}" bindtap="onFavorite">🤍</view>
+            <view class="fav-btn" wx:if="{{currentMainTab === 'favorites'}}" data-id="{{item._id}}" bindtap="onDeleteFavorite">🗑️</view>
           </view>
         </view>
       </block>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{palettes.length === 0 && !loading}}">
+      <view class="empty-icon">{{currentMainTab === 'gallery' ? '🎨' : '📁'}}</view>
+      <view class="empty-text">{{currentMainTab === 'gallery' ? '暂无配色方案' : '暂无收藏'}}</view>
+      <view class="empty-tip" wx:if="{{currentMainTab === 'favorites'}}">去拍照取色或收藏喜欢的配色吧</view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-wrap" wx:if="{{loading}}">
+      <view class="loading-text">加载中...</view>
     </view>
   </scroll-view>
 </view>

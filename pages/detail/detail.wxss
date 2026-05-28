@@ -46,6 +46,17 @@
   text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
+.band-tag {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
 /* 颜色详情 */
 .detail-scroll {
   flex: 1;
@@ -58,19 +69,35 @@
   gap: 12px;
 }
 
+.color-list-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2C2C2C;
+  margin-bottom: 12px;
+}
+
 .color-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 8px 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 10px 0;
+  border-bottom: 1px solid #F0EBE3;
+}
+
+.color-row:last-child {
+  border-bottom: none;
 }
 
 .color-dot {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   flex-shrink: 0;
 }
@@ -79,32 +106,22 @@
   flex: 1;
 }
 
-.color-name {
+.color-hex {
   font-size: 14px;
   font-weight: 600;
   color: #2C2C2C;
-}
-
-.color-hex {
-  font-size: 12px;
-  color: #6B6B6B;
-  margin-top: 2px;
-}
-
-.tag {
-  padding: 3px 10px;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-right: 6px;
 }
 
 .copy-btn {
   background: #F0EBE3;
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 11px;
+  font-size: 12px;
   color: #6B6B6B;
+}
+
+.copy-btn:active {
+  opacity: 0.7;
 }
 
 .detail-desc {
@@ -152,5 +169,20 @@
 }
 
 .btn-ghost::after {
+  border: none;
+}
+
+.btn-danger {
+  flex: 1;
+  height: 44px;
+  background: #E8B4B8;
+  color: #fff;
+  border-radius: 22px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+}
+
+.btn-danger::after {
   border: none;
 }

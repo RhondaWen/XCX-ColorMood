@@ -163,7 +163,7 @@ Page({
     this.setData({ photoColorCard: [] })
   },
 
-  // 保存色卡到云端
+  // 保存色卡到云端并添加到收藏
   async onSavePhotoCard() {
     const userInfo = wx.getStorageSync('userInfo')
     if (!userInfo || !userInfo._id) {
@@ -182,17 +182,27 @@ Page({
     const colorNames = this.data.photoColorCard.map(c => c.name).join('、')
 
     try {
+      // 1. 保存色卡到 palettes 集合
       const res = await api.savePalette({
         name: '拍照取色 - ' + colorNames,
         colors: colors,
         emotionTag: '拍照取色'
       })
 
-      wx.hideLoading()
-
       if (res.code === 0) {
-        wx.showToast({ title: '色卡已保存', icon: 'success' })
+        // 2. 自动添加到用户收藏
+        const db = wx.cloud.database()
+        const userRes = await db.collection('users').doc(userInfo._id).get()
+        const favorites = userRes.data.favorites || []
+        favorites.push(res.data._id)
+        await db.collection('users').doc(userInfo._id).update({
+          data: { favorites }
+        })
+
+        wx.hideLoading()
+        wx.showToast({ title: '已保存到收藏', icon: 'success' })
       } else {
+        wx.hideLoading()
         wx.showToast({ title: res.message || '保存失败', icon: 'none' })
       }
     } catch (err) {

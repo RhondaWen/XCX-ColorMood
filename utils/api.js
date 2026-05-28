@@ -88,11 +88,19 @@ const getPaletteList = async (params) => {
   }
 }
 
-// 获取广场色板
+// 获取广场色板（系统预设）
 const getPaletteGallery = async (params) => {
   const db = getDb()
   try {
     let query = db.collection('palettes')
+
+    // 只获取系统预设色卡（userId 为 system 或不存在，且不是拍照取色）
+    query = query.where({
+      userId: db.command.in(['system', null, undefined]).or(db.command.exists(false)),
+      emotionTag: db.command.neq('拍照取色')
+    })
+
+    // 如果有情绪标签筛选
     if (params && params.tag && params.tag !== '全部') {
       query = query.where({ emotionTag: params.tag })
     }
